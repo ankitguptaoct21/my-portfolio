@@ -153,13 +153,13 @@ const HeroBento = () => (
           </p>
         </div>
         <div className="flex gap-3">
-          <a href="#" className="flex-1 flex items-center justify-center gap-2 bg-white text-black py-3 rounded-xl font-medium hover:bg-zinc-200 transition-colors">
+          <a href="ankitgupta.oct21@gmail.com" className="flex-1 flex items-center justify-center gap-2 bg-white text-black py-3 rounded-xl font-medium hover:bg-zinc-200 transition-colors">
             <Mail size={18} /> Connect
           </a>
-          <a href="#" className="w-12 h-12 flex items-center justify-center bg-zinc-800 text-white rounded-xl hover:bg-zinc-700 transition-colors border border-white/5">
+          <a href="https://github.com/ankitguptaoct21" className="w-12 h-12 flex items-center justify-center bg-zinc-800 text-white rounded-xl hover:bg-zinc-700 transition-colors border border-white/5">
             <Github size={20} />
           </a>
-          <a href="#" className="w-12 h-12 flex items-center justify-center bg-zinc-800 text-white rounded-xl hover:bg-zinc-700 transition-colors border border-white/5">
+          <a href="https://www.linkedin.com/in/ankit-gupta-oct21/" className="w-12 h-12 flex items-center justify-center bg-zinc-800 text-white rounded-xl hover:bg-zinc-700 transition-colors border border-white/5">
             <Linkedin size={20} />
           </a>
         </div>
