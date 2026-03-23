@@ -110,7 +110,7 @@ const Navigation = () => {
             <a href="#about" className="px-4 py-2 hover:text-white hover:bg-white/5 rounded-lg transition-colors">About</a>
           </div>
 
-          <a href="#contact" className="flex items-center gap-2 text-sm font-medium bg-white text-black px-4 py-2 rounded-lg hover:bg-zinc-200 transition-colors">
+          <a href="https://www.linkedin.com/in/ankit-gupta-oct21/" className="flex items-center gap-2 text-sm font-medium bg-white text-black px-4 py-2 rounded-lg hover:bg-zinc-200 transition-colors">
             Initiate <ArrowUpRight size={16} />
           </a>
         </div>
@@ -285,10 +285,10 @@ const Footer = () => (
         </p>
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <a href="mailto:hello@example.com" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-black font-semibold flex items-center justify-center gap-2 hover:bg-zinc-200 transition-colors">
+          <a href="mailto:ankitgupta.oct21@gmail.com" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-white text-black font-semibold flex items-center justify-center gap-2 hover:bg-zinc-200 transition-colors">
             <Mail size={18} /> Initiate Contact
           </a>
-          <a href="#" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-zinc-800 text-white border border-white/10 font-semibold flex items-center justify-center gap-2 hover:bg-zinc-700 transition-colors">
+          <a href="https://www.linkedin.com/in/ankit-gupta-oct21/" className="w-full sm:w-auto px-8 py-4 rounded-xl bg-zinc-800 text-white border border-white/10 font-semibold flex items-center justify-center gap-2 hover:bg-zinc-700 transition-colors">
             <Linkedin size={18} /> Connect on LinkedIn
           </a>
         </div>
