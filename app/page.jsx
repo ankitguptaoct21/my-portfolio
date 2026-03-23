@@ -1,430 +1,630 @@
-"use client";
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Terminal, Server, Database, Cloud, Activity, 
-  Github, Linkedin, Mail, ArrowRight, Download, 
-  ChevronRight, ExternalLink, Code2, Cpu, Layers,
-  Zap, ShieldCheck
+  Github, Linkedin, Twitter, Mail, ExternalLink, 
+  Terminal, Database, Cloud, Layout, Server, 
+  Download, ChevronRight, Code2, Globe, Cpu, 
+  Quote, ArrowRight
 } from 'lucide-react';
 
-// --- DATA ---
-const SKILLS = [
-  {
-    category: "System Architecture",
-    icon: <Layers className="w-5 h-5 text-violet-400" />,
-    items: ["Microservices", "Event-Driven Design", "Distributed Systems", "gRPC / Protobuf", "GraphQL"]
-  },
-  {
-    category: "Data Engineering",
-    icon: <Database className="w-5 h-5 text-cyan-400" />,
-    items: ["PostgreSQL", "Redis", "Apache Kafka", "Elasticsearch", "ClickHouse", "MongoDB"]
-  },
-  {
-    category: "Cloud & DevOps",
-    icon: <Cloud className="w-5 h-5 text-blue-400" />,
-    items: ["AWS (EKS, RDS, S3)", "Docker & Kubernetes", "Terraform", "CI/CD Pipelines", "Datadog"]
-  },
-  {
-    category: "Core Languages",
-    icon: <Terminal className="w-5 h-5 text-emerald-400" />,
-    items: ["Go (Golang)", "Node.js / TypeScript", "Python", "Rust (Learning)", "Bash"]
-  }
-];
+// --- Custom Hooks ---
 
-const PROJECTS = [
-  {
-    id: "payment-gateway",
-    title: "Global Payment Ledger",
-    description: "Architected a highly available distributed ledger system capable of processing real-time cross-border transactions with idempotency guarantees.",
-    tech: ["Golang", "PostgreSQL", "Kafka", "Redis", "AWS EKS"],
-    metrics: [
-      { label: "Throughput", value: "10k+ TPS" },
-      { label: "Uptime", value: "99.999%" },
-      { label: "Latency", value: "< 50ms" }
-    ],
-    link: "#"
-  },
-  {
-    id: "analytics-engine",
-    title: "Real-time Telemetry Engine",
-    description: "Built a custom analytics pipeline ingesting millions of events per minute, providing real-time dashboards for enterprise clients.",
-    tech: ["TypeScript", "ClickHouse", "RabbitMQ", "Node.js"],
-    metrics: [
-      { label: "Ingestion", value: "5M events/min" },
-      { label: "Storage", value: "50TB+" },
-      { label: "Query Speed", value: "120ms avg" }
-    ],
-    link: "#"
-  }
-];
+// Simulates Framer Motion's whileInView
+const useIntersectionObserver = (options = {}) => {
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const ref = useRef(null);
 
-const EXPERIENCE = [
-  {
-    id: 1,
-    role: "Senior Backend Engineer",
-    company: "FinTech Global (Fictional)",
-    period: "2022 - Present",
-    highlights: [
-      "Led the migration from a monolithic Node.js application to an event-driven Go microservices architecture, reducing infrastructure costs by 40%.",
-      "Designed and implemented a sharded database strategy in PostgreSQL to handle a 300% YoY growth in user data.",
-      "Mentored a team of 4 mid-level engineers, establishing strict CI/CD guidelines and RFC-driven architecture planning."
-    ]
-  },
-  {
-    id: 2,
-    role: "Backend Engineer II",
-    company: "CloudScale Inc.",
-    period: "2019 - 2022",
-    highlights: [
-      "Developed core RESTful APIs for the flagship SaaS product serving over 100,000 active users.",
-      "Optimized slow API endpoints, utilizing Redis caching and index optimization to improve response times by 80%.",
-      "Integrated third-party OAuth providers and implemented JWT-based authentication with strict rate limiting."
-    ]
-  },
-  {
-    id: 3,
-    role: "Software Engineer",
-    company: "DataStream Solutions",
-    period: "2018 - 2019",
-    highlights: [
-      "Maintained legacy Python backend systems and wrote comprehensive unit and integration tests.",
-      "Automated daily reporting tasks using cron jobs and AWS Lambda."
-    ]
-  }
-];
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsIntersecting(true);
+        // Optional: unobserve after first reveal
+        if (ref.current) observer.unobserve(ref.current);
+      }
+    }, { threshold: 0.1, ...options });
 
-// --- COMPONENTS ---
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
 
-export default function App() {
+    return () => {
+      if (ref.current) observer.unobserve(ref.current);
+    };
+  }, []);
+
+  return [ref, isIntersecting];
+};
+
+// --- Reusable UI Components ---
+
+const Reveal = ({ children, delay = 0, direction = 'up' }) => {
+  const [ref, isVisible] = useIntersectionObserver();
+
+  const baseClasses = "transition-all duration-1000 ease-out";
+  const hiddenClasses = {
+    up: "opacity-0 translate-y-12",
+    down: "opacity-0 -translate-y-12",
+    left: "opacity-0 translate-x-12",
+    right: "opacity-0 -translate-x-12",
+    none: "opacity-0 scale-95"
+  };
+  const visibleClasses = "opacity-100 translate-y-0 translate-x-0 scale-100";
+
+  return (
+    <div 
+      ref={ref} 
+      className={`${baseClasses} ${isVisible ? visibleClasses : hiddenClasses[direction]}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  );
+};
+
+const GlowCard = ({ children, className = "" }) => {
+  return (
+    <div className={`relative group rounded-2xl bg-[#0a0a0a] border border-white/10 p-8 overflow-hidden transition-all duration-500 hover:border-white/20 hover:shadow-[0_0_40px_rgba(99,102,241,0.1)] ${className}`}>
+      <div className="absolute -inset-px bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-10 rounded-2xl transition-opacity duration-500 blur-md" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+};
+
+const SectionHeading = ({ title, subtitle }) => (
+  <Reveal>
+    <div className="mb-16">
+      <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-4">
+        {title}
+      </h2>
+      {subtitle && (
+        <div className="h-1 w-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full" />
+      )}
+    </div>
+  </Reveal>
+);
+
+// --- Page Sections ---
+
+const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const navLinks = ['About', 'Experience', 'Work', 'Contact'];
+
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-300 font-sans selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
-      {/* Background Effects */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] opacity-20 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-violet-600 via-cyan-900 to-transparent blur-3xl"></div>
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-soft-light"></div>
-      </div>
-
-      {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 border-b ${scrolled ? 'bg-[#09090b]/80 backdrop-blur-md border-white/10 py-4' : 'bg-transparent border-transparent py-6'}`}>
-        <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
-          <div className="font-mono font-bold text-xl tracking-tighter text-white flex items-center gap-2">
-            <Terminal className="w-5 h-5 text-cyan-400" />
-            <span>ankit.dev</span>
-          </div>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <a href="#about" className="hover:text-cyan-400 transition-colors">About</a>
-            <a href="#expertise" className="hover:text-cyan-400 transition-colors">Expertise</a>
-            <a href="#projects" className="hover:text-cyan-400 transition-colors">Projects</a>
-            <a href="#experience" className="hover:text-cyan-400 transition-colors">Experience</a>
-            <a href="#contact" className="hover:text-cyan-400 transition-colors">Contact</a>
-          </div>
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-black/50 backdrop-blur-lg border-b border-white/10 py-4' : 'bg-transparent py-6'}`}>
+      <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
+        <div className="text-xl font-bold tracking-tighter text-white flex items-center gap-2">
+          <Terminal size={24} className="text-blue-500" />
+          <span>DEV.ALEX</span>
         </div>
-      </nav>
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <a key={link} href={`#${link.toLowerCase()}`} className="text-sm font-medium text-gray-400 hover:text-white transition-colors">
+              {link}
+            </a>
+          ))}
+          <button className="px-5 py-2.5 rounded-full bg-white/10 text-white text-sm font-medium hover:bg-white hover:text-black transition-all duration-300">
+            Resume
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
+};
 
-      {/* Main Content */}
-      <main className="relative z-10 pt-32 pb-20">
-        
-        {/* HERO SECTION */}
-        <section className="max-w-6xl mx-auto px-6 pt-20 pb-32 flex flex-col items-start justify-center min-h-[80vh]">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-cyan-300 mb-8 animate-fade-in">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-            Senior Backend Engineer & System Architect
+const Hero = () => {
+  return (
+    <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[128px] mix-blend-screen animate-[pulse_8s_ease-in-out_infinite]" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[128px] mix-blend-screen animate-[pulse_10s_ease-in-out_infinite_reverse]" />
+      
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 w-full">
+        <Reveal>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-blue-400 text-sm font-medium mb-8">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+            </span>
+            Available for new opportunities
           </div>
-          
-          <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight leading-[1.1] mb-6 animate-fade-in-up">
-            Architecting the <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500">
-              invisible layer.
+        </Reveal>
+        
+        <Reveal delay={100}>
+          <h1 className="text-5xl md:text-8xl font-bold tracking-tighter text-white mb-6 leading-[1.1]">
+            Architecting <br className="hidden md:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500">
+              Digital Experiences.
             </span>
           </h1>
-          
-          <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mb-10 leading-relaxed animate-fade-in-up animation-delay-100">
-            I engineer highly available microservices, optimize distributed data systems, and build resilient infrastructure that scales from zero to millions.
+        </Reveal>
+
+        <Reveal delay={200}>
+          <p className="text-lg md:text-2xl text-gray-400 max-w-2xl mb-10 leading-relaxed">
+            I'm a Senior Software Engineer specializing in building exceptional, highly scalable, and user-centric digital products. 6 years of turning complex problems into elegant solutions.
           </p>
-          
-          <div className="flex flex-col sm:flex-row items-center gap-4 animate-fade-in-up animation-delay-200">
-            <a href="#projects" className="w-full sm:w-auto px-8 py-3 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 group">
-              View Architecture
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a href="#contact" className="w-full sm:w-auto px-8 py-3 rounded-lg bg-white/5 text-white font-medium border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center gap-2 group">
-              <Download className="w-4 h-4 text-zinc-400 group-hover:text-white transition-colors" />
-              Download Resume
-            </a>
-          </div>
+        </Reveal>
 
-          {/* Social Proof / Tech Stack Quick Look */}
-          <div className="mt-24 pt-8 border-t border-white/5 w-full flex flex-wrap items-center gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-             <p className="text-sm font-mono text-zinc-500 w-full md:w-auto">Core Stack:</p>
-             {['Golang', 'Node.js', 'PostgreSQL', 'Kafka', 'AWS', 'Kubernetes'].map(tech => (
-               <span key={tech} className="text-sm font-semibold tracking-wider text-zinc-400">{tech}</span>
-             ))}
+        <Reveal delay={300}>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <button className="w-full sm:w-auto px-8 py-4 rounded-full bg-white text-black font-semibold flex items-center justify-center gap-2 hover:bg-gray-200 hover:scale-105 transition-all duration-300">
+              View My Work <ArrowRight size={18} />
+            </button>
+            <button className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#111] text-white border border-white/10 font-semibold flex items-center justify-center gap-2 hover:bg-white/5 transition-all duration-300 group">
+              <Download size={18} className="group-hover:-translate-y-1 transition-transform" /> Download CV
+            </button>
           </div>
-        </section>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
 
-        {/* ABOUT & IDENTITY SECTION */}
-        <section id="about" className="max-w-6xl mx-auto px-6 py-24">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">The system is the product.</h2>
-              <div className="space-y-6 text-zinc-400 leading-relaxed text-lg">
-                <p>
-                  With over 6 years of deep-dive backend engineering, I don't just write APIs—I design the circulatory system of modern applications. 
-                </p>
-                <p>
-                  My philosophy is simple: **build systems that let developers sleep at night**. I focus heavily on observability, idempotency, and graceful degradation. Whether it's breaking down a monolithic nightmare or designing a greenfield event-driven architecture, I bring rigorous engineering standards to every codebase.
-                </p>
-                <div className="flex gap-4 pt-4">
-                  <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-[#0a66c2] transition-colors">
-                    <Linkedin className="w-6 h-6" />
-                  </a>
-                  <a href="https://github.com" target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-white transition-colors">
-                    <Github className="w-6 h-6" />
-                  </a>
-                </div>
-              </div>
-            </div>
-            
-            {/* Terminal Window Graphic */}
-            <div className="rounded-xl overflow-hidden border border-white/10 bg-black/50 shadow-2xl relative group">
-              <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500/10 to-violet-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div className="h-8 bg-zinc-900 border-b border-white/5 flex items-center px-4 gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                <span className="ml-auto text-xs text-zinc-500 font-mono">ankit@server: ~</span>
-              </div>
-              <div className="p-6 font-mono text-sm text-cyan-400/80">
-                <p className="text-zinc-500 mb-2">$ systemctl status ankit-brain.service</p>
-                <p className="text-green-400">● active (running) since Thu 2018-01-01 00:00:00 UTC</p>
-                <br/>
-                <p className="text-zinc-500 mb-2">$ cat core_metrics.json | jq .</p>
-                <p className="text-white">{"{"}</p>
-                <p className="pl-4">"uptime_years": <span className="text-yellow-400">6.2</span>,</p>
-                <p className="pl-4">"coffee_consumed": <span className="text-yellow-400">"9999+"</span>,</p>
-                <p className="pl-4">"bugs_created": <span className="text-yellow-400">0</span> <span className="text-zinc-500">// TODO: fix this stat</span>,</p>
-                <p className="pl-4">"focus": <span className="text-green-300">"Scalability & Resilience"</span></p>
-                <p className="text-white">{"}"}</p>
-                <span className="inline-block w-2 h-4 bg-white/50 animate-pulse mt-2"></span>
-              </div>
-            </div>
-          </div>
-        </section>
+const Stats = () => {
+  const stats = [
+    { label: 'Years Experience', value: '6+' },
+    { label: 'Projects Shipped', value: '40+' },
+    { label: 'Open Source Commits', value: '1.2k' },
+    { label: 'System Uptime', value: '99.9%' },
+  ];
 
-        {/* ENGINEERING SKILLS DASHBOARD */}
-        <section id="expertise" className="bg-zinc-900/30 border-y border-white/5 py-24 relative overflow-hidden">
-          <div className="max-w-6xl mx-auto px-6 relative z-10">
-            <div className="mb-16">
-              <h2 className="text-3xl font-bold text-white mb-4">Engineering Arsenal</h2>
-              <p className="text-zinc-400 max-w-2xl">A curated stack of technologies I use to build robust, scalable systems.</p>
-            </div>
-            
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {SKILLS.map((skill, idx) => (
-                <div key={idx} className="bg-white/[0.02] border border-white/10 rounded-xl p-6 hover:bg-white/[0.04] transition-colors group">
-                  <div className="w-12 h-12 rounded-lg bg-black/50 border border-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    {skill.icon}
+  return (
+    <section className="py-10 border-y border-white/5 bg-[#050505]">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 divide-x divide-white/5">
+          {stats.map((stat, idx) => (
+            <Reveal key={idx} delay={idx * 100} className="text-center px-4">
+              <div className="text-3xl md:text-5xl font-bold text-white mb-2">{stat.value}</div>
+              <div className="text-sm text-gray-500 font-medium uppercase tracking-wider">{stat.label}</div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Experience = () => {
+  const jobs = [
+    {
+      role: "Senior Software Engineer",
+      company: "TechNova Inc.",
+      period: "2023 - Present",
+      description: "Leading a squad of 6 engineers. Architected a microservices-based scalable backend serving 2M+ DAU. Improved core web vitals by 40% using Next.js and edge caching.",
+      tech: ["React", "Next.js", "Node.js", "AWS", "System Design"]
+    },
+    {
+      role: "Software Engineer II",
+      company: "CloudScale Systems",
+      period: "2020 - 2023",
+      description: "Developed complex enterprise dashboards. Integrated multi-tenant payment gateways and reduced CI/CD pipeline build times from 20m to 5m.",
+      tech: ["TypeScript", "React", "GraphQL", "Docker", "GCP"]
+    },
+    {
+      role: "Frontend Engineer",
+      company: "Creative Logic",
+      period: "2018 - 2020",
+      description: "Built high-performance marketing sites and interactive web applications. Worked closely with design teams to implement pixel-perfect, accessible UIs.",
+      tech: ["JavaScript", "React", "Redux", "SCSS", "Framer Motion"]
+    }
+  ];
+
+  return (
+    <section id="experience" className="py-32 relative">
+      <div className="max-w-4xl mx-auto px-6 md:px-12">
+        <SectionHeading title="Experience" subtitle={true} />
+        
+        <div className="space-y-12">
+          {jobs.map((job, idx) => (
+            <Reveal key={idx} delay={idx * 100}>
+              <div className="relative pl-8 md:pl-0">
+                {/* Timeline Line for Mobile */}
+                <div className="md:hidden absolute left-0 top-2 bottom-0 w-px bg-white/10" />
+                <div className="md:hidden absolute left-[-4px] top-2 h-2 w-2 rounded-full bg-blue-500 ring-4 ring-[#0a0a0a]" />
+
+                <div className="md:grid md:grid-cols-4 gap-8 group">
+                  <div className="mb-4 md:mb-0 md:text-right pt-1">
+                    <span className="text-sm font-medium text-blue-400">{job.period}</span>
                   </div>
-                  <h3 className="text-lg font-semibold text-white mb-4">{skill.category}</h3>
-                  <ul className="space-y-2">
-                    {skill.items.map((item, i) => (
-                      <li key={i} className="text-sm text-zinc-400 flex items-center gap-2">
-                        <ChevronRight className="w-3 h-3 text-cyan-500/50" />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* SIGNATURE PROJECTS */}
-        <section id="projects" className="max-w-6xl mx-auto px-6 py-24">
-          <div className="flex items-center gap-4 mb-16">
-            <h2 className="text-3xl font-bold text-white">Signature Architecture</h2>
-            <div className="h-[1px] flex-1 bg-gradient-to-r from-white/10 to-transparent"></div>
-          </div>
-
-          <div className="space-y-12">
-            {PROJECTS.map((project, idx) => (
-              <div key={project.id} className="group relative grid md:grid-cols-12 gap-8 items-center">
-                {/* Project Info Card */}
-                <div className={`md:col-span-7 relative z-10 ${idx % 2 !== 0 ? 'md:order-2 md:col-start-6' : ''}`}>
-                  <div className="bg-[#0f0f11] border border-white/10 rounded-2xl p-8 hover:border-cyan-500/30 transition-all duration-500 shadow-2xl">
-                    <div className="flex gap-2 mb-6 flex-wrap">
-                      {project.tech.map(t => (
-                        <span key={t} className="px-2.5 py-1 text-xs font-mono rounded bg-white/5 text-cyan-300 border border-white/5">
-                          {t}
+                  <div className="md:col-span-3">
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">
+                      {job.role}
+                    </h3>
+                    <div className="text-lg text-gray-400 mb-4">{job.company}</div>
+                    <p className="text-gray-500 leading-relaxed mb-6">
+                      {job.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {job.tech.map(tech => (
+                        <span key={tech} className="px-3 py-1 text-xs font-medium text-gray-300 bg-white/5 rounded-full border border-white/10">
+                          {tech}
                         </span>
                       ))}
                     </div>
-                    
-                    <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-cyan-400 transition-colors">
-                      {project.title}
-                    </h3>
-                    
-                    <p className="text-zinc-400 leading-relaxed mb-8">
-                      {project.description}
-                    </p>
-
-                    {/* Metrics Dashboard inside card */}
-                    <div className="grid grid-cols-3 gap-4 p-4 rounded-xl bg-black/40 border border-white/5">
-                      {project.metrics.map((m, i) => (
-                        <div key={i}>
-                          <div className="text-xs text-zinc-500 mb-1">{m.label}</div>
-                          <div className="text-sm font-semibold text-white font-mono">{m.value}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Abstract Visual Representation */}
-                <div className={`md:col-span-6 absolute md:relative inset-0 opacity-10 md:opacity-100 pointer-events-none ${idx % 2 !== 0 ? 'md:order-1' : ''}`}>
-                  <div className="h-full min-h-[300px] w-full border border-white/5 rounded-2xl bg-gradient-to-br from-white/[0.02] to-transparent flex items-center justify-center overflow-hidden relative">
-                    {/* Simulated Architecture Node Graph */}
-                    <div className="absolute top-1/2 left-1/4 w-12 h-12 bg-blue-500/20 rounded border border-blue-500/30 flex items-center justify-center animate-pulse">
-                       <Server className="w-5 h-5 text-blue-400" />
-                    </div>
-                    <div className="absolute top-1/4 right-1/4 w-12 h-12 bg-cyan-500/20 rounded border border-cyan-500/30 flex items-center justify-center">
-                       <Database className="w-5 h-5 text-cyan-400" />
-                    </div>
-                    <div className="absolute bottom-1/4 right-1/3 w-12 h-12 bg-violet-500/20 rounded border border-violet-500/30 flex items-center justify-center">
-                       <Activity className="w-5 h-5 text-violet-400" />
-                    </div>
-                    {/* Connecting lines simulated via SVG */}
-                    <svg className="absolute inset-0 w-full h-full stroke-white/10" fill="none">
-                      <path d="M 30% 50% L 75% 25%" strokeWidth="1" strokeDasharray="4 4" className="animate-[dash_20s_linear_infinite]" />
-                      <path d="M 30% 50% L 66% 75%" strokeWidth="1" strokeDasharray="4 4" className="animate-[dash_20s_linear_infinite_reverse]" />
-                    </svg>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
 
-        {/* EXPERIENCE TIMELINE */}
-        <section id="experience" className="bg-black py-24 border-y border-white/5 relative">
-          <div className="max-w-4xl mx-auto px-6">
-            <h2 className="text-3xl font-bold text-white mb-16 text-center">Professional Trajectory</h2>
-            
-            <div className="space-y-12">
-              {EXPERIENCE.map((exp, idx) => (
-                <div key={exp.id} className="relative pl-8 md:pl-0 group">
-                  {/* Timeline Line */}
-                  <div className="md:hidden absolute left-0 top-2 bottom-0 w-[1px] bg-white/10"></div>
-                  <div className="hidden md:block absolute left-1/2 top-0 bottom-[-48px] w-[1px] bg-white/10 -translate-x-1/2 group-last:bg-gradient-to-b group-last:from-white/10 group-last:to-transparent"></div>
-                  
-                  {/* Timeline Dot */}
-                  <div className="absolute left-[-4px] md:left-1/2 top-2 w-2 h-2 rounded-full bg-cyan-500 md:-translate-x-1/2 ring-4 ring-[#09090b] shadow-[0_0_10px_rgba(6,182,212,0.5)] group-hover:scale-150 transition-transform"></div>
+const Skills = () => {
+  const skillCategories = [
+    {
+      title: "Frontend Development",
+      icon: <Layout className="text-blue-400" size={24} />,
+      skills: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Framer Motion", "Redux"]
+    },
+    {
+      title: "Backend & Systems",
+      icon: <Server className="text-purple-400" size={24} />,
+      skills: ["Node.js", "Python", "Go", "PostgreSQL", "Redis", "GraphQL"]
+    },
+    {
+      title: "Cloud & DevOps",
+      icon: <Cloud className="text-emerald-400" size={24} />,
+      skills: ["AWS", "Docker", "Kubernetes", "CI/CD", "Terraform", "Vercel"]
+    },
+    {
+      title: "Architecture",
+      icon: <Cpu className="text-orange-400" size={24} />,
+      skills: ["System Design", "Microservices", "Serverless", "Event-Driven", "WebSockets"]
+    }
+  ];
 
-                  <div className={`md:w-1/2 ${idx % 2 === 0 ? 'md:pr-16 md:ml-auto md:text-left' : 'md:pl-16 md:mr-auto md:text-right md:flex md:flex-col md:items-end'} relative`}>
-                    
-                    {/* The specific positioning hack for alternating timeline */}
-                    <div className={`absolute top-0 w-full h-full hidden md:block ${idx % 2 === 0 ? '-left-full pr-16 text-right' : '-right-full pl-16 text-left'}`}>
-                       <span className="font-mono text-cyan-400/60 font-semibold">{exp.period}</span>
+  return (
+    <section className="py-32 bg-[#050505]">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <SectionHeading title="Technical Arsenal" subtitle={true} />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {skillCategories.map((category, idx) => (
+            <Reveal key={idx} delay={idx * 100}>
+              <GlowCard className="h-full">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="p-3 bg-white/5 rounded-xl border border-white/10">
+                    {category.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-white">{category.title}</h3>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {category.skills.map(skill => (
+                    <div key={skill} className="px-4 py-2 bg-[#111] border border-white/5 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:border-white/20 transition-colors cursor-default">
+                      {skill}
                     </div>
+                  ))}
+                </div>
+              </GlowCard>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
 
-                    <div className="md:hidden font-mono text-sm text-cyan-400/80 mb-2">{exp.period}</div>
-                    
-                    <h3 className="text-xl font-bold text-white mb-1">{exp.role}</h3>
-                    <h4 className="text-zinc-500 font-medium mb-4">{exp.company}</h4>
-                    
-                    <ul className={`space-y-3 text-zinc-400 text-sm ${idx % 2 !== 0 ? 'md:text-right' : ''}`}>
-                      {exp.highlights.map((highlight, i) => (
-                        <li key={i} className="flex gap-3 md:justify-end md:flex-row-reverse">
-                          <span className={`mt-1.5 w-1.5 h-1.5 rounded-full bg-zinc-700 shrink-0 ${idx % 2 !== 0 ? 'md:hidden' : ''}`}></span>
-                          <span className={`mt-1.5 w-1.5 h-1.5 rounded-full bg-zinc-700 shrink-0 hidden ${idx % 2 !== 0 ? 'md:block' : ''}`}></span>
-                          <span className={`${idx % 2 !== 0 ? 'md:text-right' : 'text-left'} flex-1`}>{highlight}</span>
-                        </li>
+const Projects = () => {
+  const projects = [
+    {
+      title: "Nebula - Data Visualization Tool",
+      description: "High-performance webGL based dashboard for enterprise data analytics. Processes 1M+ data points in real-time.",
+      tech: ["React", "Three.js", "WebSocket", "Node.js"],
+      image: "linear-gradient(145deg, #1e1b4b 0%, #312e81 100%)",
+      featured: true
+    },
+    {
+      title: "Aura - FinTech Platform",
+      description: "Secure, compliant multi-tenant application for modern financial teams. Includes real-time collaboration.",
+      tech: ["Next.js", "TypeScript", "Prisma", "AWS KMS"],
+      image: "linear-gradient(145deg, #064e3b 0%, #065f46 100%)",
+      featured: true
+    },
+    {
+      title: "Nexus API Gateway",
+      description: "Open-source lightweight API gateway built for serverless architectures with zero cold starts.",
+      tech: ["Go", "Redis", "Docker", "gRPC"],
+      image: "linear-gradient(145deg, #450a0a 0%, #7f1d1d 100%)",
+      featured: false
+    },
+    {
+      title: "DevFlow - IDE Extension",
+      description: "AI-powered workflow optimizer that predicts and pre-fetches documentation.",
+      tech: ["TypeScript", "OpenAI", "VS Code API"],
+      image: "linear-gradient(145deg, #3b0764 0%, #581c87 100%)",
+      featured: false
+    }
+  ];
+
+  return (
+    <section id="work" className="py-32 relative">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <SectionHeading title="Featured Work" subtitle={true} />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {projects.map((project, idx) => (
+            <Reveal key={idx} delay={idx * 100} className={project.featured ? "md:col-span-2" : ""}>
+              <GlowCard className="group p-0">
+                <div className={`flex flex-col ${project.featured ? 'md:flex-row' : ''} h-full`}>
+                  {/* Image Placeholder */}
+                  <div 
+                    className={`${project.featured ? 'md:w-1/2 min-h-[300px]' : 'h-48'} w-full relative overflow-hidden`}
+                    style={{ background: project.image }}
+                  >
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500" />
+                    {/* Abstract Shapes for image mock */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 border border-white/20 rounded-full group-hover:scale-110 transition-transform duration-700" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border border-white/10 rounded-full group-hover:scale-125 transition-transform duration-700 delay-100" />
+                  </div>
+                  
+                  {/* Content */}
+                  <div className={`p-8 md:p-10 flex flex-col justify-center ${project.featured ? 'md:w-1/2' : ''}`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-2xl font-bold text-white group-hover:text-blue-400 transition-colors">
+                        {project.title}
+                      </h3>
+                      <a href="#" className="text-gray-500 hover:text-white transition-colors">
+                        <ExternalLink size={20} />
+                      </a>
+                    </div>
+                    <p className="text-gray-400 leading-relaxed mb-6">
+                      {project.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2 mt-auto">
+                      {project.tech.map(tech => (
+                        <span key={tech} className="text-xs font-mono text-blue-300 bg-blue-500/10 px-3 py-1 rounded">
+                          {tech}
+                        </span>
                       ))}
-                    </ul>
+                    </div>
                   </div>
                 </div>
-              ))}
+              </GlowCard>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const GithubContributions = () => {
+  // Mock generation for 52 weeks x 7 days
+  const weeks = Array.from({ length: 52 }, () => 
+    Array.from({ length: 7 }, () => Math.random() > 0.5 ? Math.floor(Math.random() * 4) + 1 : 0)
+  );
+
+  const getColor = (level) => {
+    switch(level) {
+      case 1: return 'bg-[#0e4429]';
+      case 2: return 'bg-[#006d32]';
+      case 3: return 'bg-[#26a641]';
+      case 4: return 'bg-[#39d353]';
+      default: return 'bg-[#161b22]'; // empty
+    }
+  };
+
+  return (
+    <section className="py-20 bg-[#050505] overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        <Reveal>
+          <div className="flex items-center gap-4 mb-10">
+            <Github size={28} className="text-white" />
+            <h2 className="text-2xl font-bold text-white">Open Source & Contributions</h2>
+          </div>
+          
+          <div className="p-6 md:p-8 bg-[#0d1117] border border-white/5 rounded-2xl overflow-x-auto">
+            <div className="min-w-[800px]">
+              <div className="flex gap-1">
+                {weeks.map((week, i) => (
+                  <div key={i} className="flex flex-col gap-1">
+                    {week.map((day, j) => (
+                      <div 
+                        key={j} 
+                        className={`w-3 h-3 rounded-sm ${getColor(day)} transition-colors duration-300 hover:ring-1 hover:ring-white`}
+                        title="Contribution mock"
+                      />
+                    ))}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
+                <span>1,245 contributions in the last year</span>
+                <div className="flex items-center gap-2">
+                  <span>Less</span>
+                  <div className="flex gap-1">
+                    {[0, 1, 2, 3, 4].map(level => (
+                      <div key={level} className={`w-3 h-3 rounded-sm ${getColor(level)}`} />
+                    ))}
+                  </div>
+                  <span>More</span>
+                </div>
+              </div>
             </div>
           </div>
-        </section>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
 
-        {/* CTA / CONTACT SECTION */}
-        <section id="contact" className="max-w-4xl mx-auto px-6 py-32 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-violet-500/20 border border-white/10 mb-8">
-            <Mail className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-4xl font-bold text-white mb-6">Ready to scale?</h2>
-          <p className="text-zinc-400 text-lg mb-10 max-w-xl mx-auto">
-            Whether you're dealing with technical debt, architecting a new microservice, or just want to talk system design—I'm open to discussing new opportunities.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <a href="mailto:hello@ankit.dev" className="px-8 py-4 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition-all flex items-center justify-center gap-2 group w-full sm:w-auto">
-              Get in Touch
-              <ExternalLink className="w-4 h-4" />
-            </a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="px-8 py-4 rounded-lg bg-[#0a66c2]/10 text-[#0a66c2] font-semibold border border-[#0a66c2]/30 hover:bg-[#0a66c2]/20 transition-all flex items-center justify-center gap-2 w-full sm:w-auto">
-              <Linkedin className="w-4 h-4" />
-              Connect on LinkedIn
-            </a>
-          </div>
-        </section>
+const Blogs = () => {
+  const posts = [
+    {
+      title: "Building Scalable Systems with Next.js and Redis",
+      date: "Oct 24, 2025",
+      readTime: "8 min read"
+    },
+    {
+      title: "The Future of Frontend Architecture in 2026",
+      date: "Sep 12, 2025",
+      readTime: "6 min read"
+    },
+    {
+      title: "Mastering System Design: A Developer's Guide",
+      date: "Aug 05, 2025",
+      readTime: "12 min read"
+    }
+  ];
 
+  return (
+    <section className="py-32">
+      <div className="max-w-4xl mx-auto px-6 md:px-12">
+        <SectionHeading title="Writing" subtitle={true} />
+        
+        <div className="space-y-6">
+          {posts.map((post, idx) => (
+            <Reveal key={idx} delay={idx * 100}>
+              <a href="#" className="block group">
+                <div className="py-6 border-b border-white/10 group-hover:border-blue-500/50 transition-colors">
+                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                    <span>{post.date}</span>
+                    <span className="w-1 h-1 rounded-full bg-gray-700" />
+                    <span>{post.readTime}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xl md:text-2xl font-bold text-gray-200 group-hover:text-blue-400 transition-colors">
+                      {post.title}
+                    </h3>
+                    <ChevronRight className="text-gray-600 group-hover:text-blue-400 group-hover:translate-x-2 transition-all" />
+                  </div>
+                </div>
+              </a>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Contact = () => {
+  return (
+    <section id="contact" className="py-32 relative overflow-hidden bg-[#050505]">
+      {/* Background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg h-[400px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+        <div className="grid md:grid-cols-2 gap-16 items-center">
+          <Reveal>
+            <div>
+              <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+                Let's build something <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">extraordinary.</span>
+              </h2>
+              <p className="text-lg text-gray-400 mb-10 leading-relaxed max-w-md">
+                Whether you have a project in mind or just want to chat about tech, architecture, or potential opportunities, my inbox is open.
+              </p>
+              
+              <div className="flex flex-col gap-6">
+                <a href="mailto:hello@example.com" className="flex items-center gap-4 text-gray-300 hover:text-white group w-fit">
+                  <div className="p-4 bg-white/5 rounded-full border border-white/10 group-hover:border-blue-500/50 group-hover:bg-blue-500/10 transition-colors">
+                    <Mail size={20} className="group-hover:text-blue-400" />
+                  </div>
+                  <span className="text-lg font-medium">hello@devalex.com</span>
+                </a>
+                
+                <div className="flex items-center gap-4 mt-4">
+                  {[
+                    { icon: <Github size={20} />, href: "#" },
+                    { icon: <Linkedin size={20} />, href: "#" },
+                    { icon: <Twitter size={20} />, href: "#" }
+                  ].map((social, idx) => (
+                    <a key={idx} href={social.href} className="p-4 bg-white/5 rounded-full border border-white/10 hover:border-white/30 hover:bg-white/10 text-gray-400 hover:text-white transition-all hover:-translate-y-1">
+                      {social.icon}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={200}>
+            <GlowCard>
+              <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Name</label>
+                  <input 
+                    type="text" 
+                    className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                    placeholder="John Doe"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Email</label>
+                  <input 
+                    type="email" 
+                    className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                    placeholder="john@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Message</label>
+                  <textarea 
+                    rows={4}
+                    className="w-full bg-[#111] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors resize-none"
+                    placeholder="Tell me about your project..."
+                  />
+                </div>
+                <button className="w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold hover:opacity-90 hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2">
+                  Send Message <ArrowRight size={18} />
+                </button>
+              </form>
+            </GlowCard>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Footer = () => (
+  <footer className="py-8 border-t border-white/10 text-center">
+    <p className="text-gray-500 text-sm">
+      &copy; {new Date().getFullYear()} Alex Dev. Built with React & Tailwind.
+    </p>
+  </footer>
+);
+
+// --- Main App Entry ---
+
+export default function App() {
+  // Simulate setting basic SEO meta tags
+  useEffect(() => {
+    document.title = "Alex | Senior Software Engineer";
+    const metaDescription = document.createElement('meta');
+    metaDescription.name = "description";
+    metaDescription.content = "Portfolio of Alex, a Senior Software Engineer with 6 years of experience building scalable architectures and premium digital products.";
+    document.head.appendChild(metaDescription);
+    
+    // Smooth scroll behavior for internal links
+    document.documentElement.style.scrollBehavior = 'smooth';
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-gray-100 font-sans selection:bg-blue-500/30 selection:text-white">
+      <Navbar />
+      
+      <main>
+        <Hero />
+        <Stats />
+        <Experience />
+        <Skills />
+        <Projects />
+        <GithubContributions />
+        <Blogs />
+        <Contact />
       </main>
 
-      {/* FOOTER */}
-      <footer className="border-t border-white/5 py-10 bg-black text-center relative z-10">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-zinc-500 text-sm font-mono flex items-center gap-2">
-            <Terminal className="w-4 h-4" /> Built by Ankit © {new Date().getFullYear()}
-          </div>
-          <div className="text-zinc-600 text-sm">
-            Designed for Scale. Engineered for Resilience.
-          </div>
-        </div>
-      </footer>
-
-      {/* Global Styles for Custom Animations */}
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes fade-in-up {
-          0% { opacity: 0; transform: translateY(20px); }
-          100% { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fade-in {
-          0% { opacity: 0; }
-          100% { opacity: 1; }
-        }
-        @keyframes dash {
-          to { stroke-dashoffset: -100; }
-        }
-        .animate-fade-in-up {
-          animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .animate-fade-in {
-          animation: fade-in 1s ease-out forwards;
-        }
-        .animation-delay-100 {
-          animation-delay: 100ms;
-        }
-        .animation-delay-200 {
-          animation-delay: 200ms;
-        }
-        html {
-          scroll-behavior: smooth;
-        }
-      `}} />
+      <Footer />
     </div>
   );
 }
