@@ -133,7 +133,7 @@ const Navigation = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <a href="/resume.pdf" className="hidden md:flex items-center gap-2 text-sm font-medium bg-zinc-800 text-white border border-white/10 px-4 py-2 rounded-lg hover:bg-zinc-700 transition-colors">
+            <a href="/resume" className="hidden md:flex items-center gap-2 text-sm font-medium bg-zinc-800 text-white border border-white/10 px-4 py-2 rounded-lg hover:bg-zinc-700 transition-colors">
               <FileText size={16} /> Resume
             </a>
             <a href="https://www.linkedin.com/in/ankit-gupta-oct21/" className="flex items-center gap-2 text-sm font-medium bg-white text-black px-4 py-2 rounded-lg hover:bg-zinc-200 transition-colors">
