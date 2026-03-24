@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   ArrowUpRight, Github, Linkedin, Mail, 
-  Terminal, Database, Network, Cpu, Code2, 
-  ArrowRight, Activity, Server, Zap, Globe
+  Terminal, Database, Network, Cpu,
+  ArrowRight, Server, Zap, Globe, FileText, BookOpen
 } from 'lucide-react';
 
 // --- DATA DEFINITIONS ---
@@ -53,6 +53,27 @@ const EXPERTISE = [
   { name: "Cloud Infrastructure", icon: <Globe size={20} /> },
   { name: "Microservices", icon: <Server size={20} /> },
   { name: "System Design", icon: <Cpu size={20} /> },
+];
+
+const SYSTEM_DESIGNS = [
+  {
+    title: "Telemetry Pipeline",
+    challenge: "Ingest bursty IoT traffic with ordering guarantees and low query latency.",
+    tradeoff: "Used Kafka partitions for ordering over strict global ordering to preserve horizontal scale.",
+    flow: ["Edge Devices", "API Gateway", "Kafka", "Stream Processors", "ClickHouse", "Dashboards"],
+  },
+  {
+    title: "Global Rate Limiter",
+    challenge: "Protect multi-region APIs from abuse without penalizing legitimate spikes.",
+    tradeoff: "Chose sliding-window logs for precision at the cost of higher memory than token bucket.",
+    flow: ["Client", "Gateway", "Redis Cluster", "Limiter Service", "Policy Store", "Protected APIs"],
+  },
+];
+
+const INSIGHTS = [
+  "Handling Redis hotspots with shard-aware keyspace design.",
+  "Designing ACID-safe financial workflows with Temporal compensations.",
+  "Practical approaches to P99 optimization in high-throughput APIs.",
 ];
 
 // --- ANIMATION VARIANTS ---
@@ -106,13 +127,19 @@ const Navigation = () => {
           
           <div className="hidden md:flex items-center gap-1 font-medium text-sm text-zinc-400">
             <a href="#work" className="px-4 py-2 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Work</a>
+            <a href="#system-design" className="px-4 py-2 hover:text-white hover:bg-white/5 rounded-lg transition-colors">System Design</a>
             <a href="#expertise" className="px-4 py-2 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Expertise</a>
             <a href="#about" className="px-4 py-2 hover:text-white hover:bg-white/5 rounded-lg transition-colors">About</a>
           </div>
 
-          <a href="https://www.linkedin.com/in/ankit-gupta-oct21/" className="flex items-center gap-2 text-sm font-medium bg-white text-black px-4 py-2 rounded-lg hover:bg-zinc-200 transition-colors">
-            Initiate <ArrowUpRight size={16} />
-          </a>
+          <div className="flex items-center gap-2">
+            <a href="/resume.pdf" className="hidden md:flex items-center gap-2 text-sm font-medium bg-zinc-800 text-white border border-white/10 px-4 py-2 rounded-lg hover:bg-zinc-700 transition-colors">
+              <FileText size={16} /> Resume
+            </a>
+            <a href="https://www.linkedin.com/in/ankit-gupta-oct21/" className="flex items-center gap-2 text-sm font-medium bg-white text-black px-4 py-2 rounded-lg hover:bg-zinc-200 transition-colors">
+              Initiate <ArrowUpRight size={16} />
+            </a>
+          </div>
         </div>
       </div>
     </motion.nav>
@@ -153,7 +180,7 @@ const HeroBento = () => (
           </p>
         </div>
         <div className="flex gap-3">
-          <a href="ankitgupta.oct21@gmail.com" className="flex-1 flex items-center justify-center gap-2 bg-white text-black py-3 rounded-xl font-medium hover:bg-zinc-200 transition-colors">
+          <a href="mailto:ankitgupta.oct21@gmail.com" className="flex-1 flex items-center justify-center gap-2 bg-white text-black py-3 rounded-xl font-medium hover:bg-zinc-200 transition-colors">
             <Mail size={18} /> Connect
           </a>
           <a href="https://github.com/ankitguptaoct21" className="w-12 h-12 flex items-center justify-center bg-zinc-800 text-white rounded-xl hover:bg-zinc-700 transition-colors border border-white/5">
@@ -168,7 +195,7 @@ const HeroBento = () => (
       {/* Metrics Row */}
       {METRICS.map((metric, i) => (
         <motion.div key={metric.id} variants={fadeUp} className="md:col-span-4 bg-zinc-900/30 border border-white/5 rounded-3xl p-8 hover:bg-zinc-900/60 transition-colors">
-          <div className="text-zinc-500 font-mono text-xs uppercase tracking-widest mb-4">0{i + 1} // {metric.label}</div>
+          <div className="text-zinc-500 font-mono text-xs uppercase tracking-widest mb-4">0{i + 1} - {metric.label}</div>
           <div className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-2">{metric.value}</div>
           <div className="text-sm text-zinc-400">{metric.desc}</div>
         </motion.div>
@@ -207,7 +234,7 @@ const ArchitectureShowcase = () => (
     <div className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
       <div>
         <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tighter mb-4">Architectural Showcases</h2>
-        <p className="text-lg text-zinc-400 font-light max-w-xl">Deep dives into complex systems I've designed, scaled, and maintained in production.</p>
+        <p className="text-lg text-zinc-400 font-light max-w-xl">Deep dives into complex systems I have designed, scaled, and maintained in production.</p>
       </div>
     </div>
 
@@ -216,7 +243,6 @@ const ArchitectureShowcase = () => (
         <motion.div 
           initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }}
           key={project.id}
-          // The sticky classes create the stacking card effect
           className="sticky top-32 mb-12 w-full origin-top"
           style={{ zIndex: index, marginTop: index === 0 ? 0 : '40px' }}
         >
@@ -271,6 +297,93 @@ const ArchitectureShowcase = () => (
   </section>
 );
 
+const SystemDesignSection = () => (
+  <section id="system-design" className="py-32 px-6 max-w-7xl mx-auto z-10 relative">
+    <div className="mb-16">
+      <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tighter mb-4">System Design Deep Dives</h2>
+      <p className="text-lg text-zinc-400 max-w-3xl font-light">
+        Recruiter-friendly architecture snapshots with explicit constraints, decisions, and trade-offs.
+      </p>
+    </div>
+
+    <div className="space-y-8">
+      {SYSTEM_DESIGNS.map((item) => (
+        <motion.article
+          key={item.title}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={fadeUp}
+          className="border border-white/10 rounded-3xl bg-zinc-900/40 p-8 md:p-10"
+        >
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <h3 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">{item.title}</h3>
+            <span className="text-xs uppercase tracking-wider text-zinc-400 border border-white/10 px-3 py-1 rounded-full">
+              Case Snapshot
+            </span>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-6">
+            <div className="p-5 rounded-2xl bg-black/30 border border-white/10">
+              <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-2">Challenge</p>
+              <p className="text-zinc-300">{item.challenge}</p>
+            </div>
+            <div className="p-5 rounded-2xl bg-black/30 border border-white/10">
+              <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-2">Trade-off</p>
+              <p className="text-zinc-300">{item.tradeoff}</p>
+            </div>
+          </div>
+
+          <div className="rounded-2xl bg-black/40 border border-white/10 p-5">
+            <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-3">Architecture Flow</p>
+            <div className="flex flex-wrap items-center gap-2">
+              {item.flow.map((node, idx) => (
+                <React.Fragment key={`${item.title}-${node}`}>
+                  <span className="px-3 py-2 rounded-lg bg-zinc-800 text-zinc-200 text-sm border border-white/5">
+                    {node}
+                  </span>
+                  {idx < item.flow.length - 1 && <ArrowRight size={14} className="text-zinc-500" />}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        </motion.article>
+      ))}
+    </div>
+  </section>
+);
+
+const AboutAndInsights = () => (
+  <section id="about" className="py-32 px-6 max-w-7xl mx-auto z-10 relative">
+    <div className="grid md:grid-cols-2 gap-8">
+      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="p-8 rounded-3xl border border-white/10 bg-zinc-900/40">
+        <h2 className="text-3xl font-bold text-white tracking-tight mb-5">Engineering Philosophy</h2>
+        <p className="text-zinc-300 leading-relaxed">
+          I do my best work in teams that value ownership, calm incident response, and pragmatic architecture.
+          I care about building systems that are understandable under load, observable in production, and easy for
+          engineers to evolve without fear.
+        </p>
+      </motion.div>
+
+      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="p-8 rounded-3xl border border-white/10 bg-zinc-900/40">
+        <h2 className="text-3xl font-bold text-white tracking-tight mb-5">Technical Insights</h2>
+        <div className="space-y-3">
+          {INSIGHTS.map((insight) => (
+            <a
+              key={insight}
+              href="#"
+              className="flex items-start gap-3 p-3 rounded-xl border border-white/5 hover:border-white/15 hover:bg-white/[0.02] transition-colors"
+            >
+              <BookOpen size={18} className="text-zinc-400 mt-0.5" />
+              <span className="text-zinc-300">{insight}</span>
+            </a>
+          ))}
+        </div>
+      </motion.div>
+    </div>
+  </section>
+);
+
 const Footer = () => (
   <section id="contact" className="py-32 px-6 max-w-7xl mx-auto z-10 relative border-t border-white/5 mt-20">
     <div className="bg-zinc-900/30 border border-white/10 rounded-[3rem] p-12 md:p-24 text-center relative overflow-hidden">
@@ -281,7 +394,7 @@ const Footer = () => (
           Architect the next level.
         </h2>
         <p className="text-xl text-zinc-400 font-light mb-12 max-w-2xl mx-auto">
-          Whether you're scaling an MVP to enterprise readiness or restructuring a legacy monolith, I'm ready to engineer the solution.
+          Whether you are scaling an MVP to enterprise readiness or restructuring a legacy monolith, I am ready to engineer the solution.
         </p>
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -315,6 +428,8 @@ export default function App() {
         <HeroBento />
         <ExpertiseSection />
         <ArchitectureShowcase />
+        <SystemDesignSection />
+        <AboutAndInsights />
         <Footer />
       </main>
     </div>

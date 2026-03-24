@@ -14,8 +14,34 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Ankit Gupta",
-  description: "The Ankit Gupta is a software engineer with a passion for building scalable and efficient systems. He is a graduate of the University of California, Berkeley, and has a background in computer science and engineering.",
+  title: "Ankit Gupta | Senior Backend Engineer",
+  description:
+    "Portfolio of Ankit Gupta, Senior Backend Engineer focused on distributed systems, scalable backend architecture, and high-throughput data platforms.",
+};
+
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Ankit Gupta",
+  jobTitle: "Senior Backend Engineer",
+  url: "https://ankit.dev",
+  sameAs: [
+    "https://github.com/ankitguptaoct21",
+    "https://www.linkedin.com/in/ankit-gupta-oct21/",
+  ],
+};
+
+const softwareSourceCodeSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  name: "Ankit Gupta Portfolio",
+  codeRepository: "https://github.com/ankitguptaoct21/my-portfolio",
+  programmingLanguage: ["TypeScript", "JavaScript"],
+  runtimePlatform: "Node.js",
+  creator: {
+    "@type": "Person",
+    name: "Ankit Gupta",
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +54,19 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(softwareSourceCodeSchema),
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
