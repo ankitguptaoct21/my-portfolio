@@ -480,8 +480,15 @@ body:has(.shell) {
   font-weight: 750;
   line-height: 1.15;
   letter-spacing: -0.02em;
-  max-width: 30ch;
   text-wrap: balance;
+}
+/* Wide panels (tablet and desktop): every section title on one line. The size scales
+   with the panel width so the longest title still fits; phones wrap as before. */
+@container panel (min-width: 640px) {
+  .panel-title {
+    white-space: nowrap;
+    font-size: clamp(18px, 2.6cqi, 28px);
+  }
 }
 .next-tab {
   justify-self: end;
