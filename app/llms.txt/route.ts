@@ -31,10 +31,15 @@ export function GET() {
     "",
     ...GERMANY.facts.map((f) => `- ${f.label}: ${f.value}`),
     "",
-    `## Now building: ${NOW_BUILDING.name} (${NOW_BUILDING.status.toLowerCase()})`,
-    "",
-    `${NOW_BUILDING.pitch} ${NOW_BUILDING.how} Data path: ${NOW_BUILDING.flow.join(" → ")}.`,
-    "",
+    // Listed only once the project has a public repo, matching the homepage.
+    ...(NOW_BUILDING.repo
+      ? [
+          `## Now building: ${NOW_BUILDING.name} (${NOW_BUILDING.status.toLowerCase()})`,
+          "",
+          `${NOW_BUILDING.pitch} ${NOW_BUILDING.how} Data path: ${NOW_BUILDING.flow.join(" → ")}. Code: ${NOW_BUILDING.repo}`,
+          "",
+        ]
+      : []),
     "## Skills, by where they sit on the data path",
     "",
     ...DATA_PATH.map((s) => `- ${s.stage}: ${s.items.join(", ")}`),

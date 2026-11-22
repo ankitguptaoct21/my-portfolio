@@ -172,22 +172,23 @@ export default function Home() {
 
             <PipelineDemo />
 
-            <article className="card build" aria-labelledby="build-title">
-              <div className="build-top">
-                <span className="build-status">{NOW_BUILDING.status}</span>
-                <span className="build-kicker">Now building</span>
-              </div>
-              <h3 id="build-title" className="build-name">
-                {NOW_BUILDING.name}
-              </h3>
-              <p className="build-text">{NOW_BUILDING.plain}</p>
-              <Tags items={NOW_BUILDING.flow} />
-              {NOW_BUILDING.repo && (
+            {/* Hidden until the project has a public repo: set NOW_BUILDING.repo in content.ts. */}
+            {NOW_BUILDING.repo && (
+              <article className="card build" aria-labelledby="build-title">
+                <div className="build-top">
+                  <span className="build-status">{NOW_BUILDING.status}</span>
+                  <span className="build-kicker">Now building</span>
+                </div>
+                <h3 id="build-title" className="build-name">
+                  {NOW_BUILDING.name}
+                </h3>
+                <p className="build-text">{NOW_BUILDING.plain}</p>
+                <Tags items={NOW_BUILDING.flow} />
                 <a href={NOW_BUILDING.repo} className="btn btn-sm" target="_blank" rel="noreferrer">
                   Code on GitHub <ArrowUpRight size={15} aria-hidden="true" />
                 </a>
-              )}
-            </article>
+              </article>
+            )}
           </div>
         </section>
 

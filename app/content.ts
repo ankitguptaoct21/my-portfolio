@@ -257,7 +257,7 @@ export const CASES: Case[] = [
 // Shown as a slim row in the work list, between the two roles it sits between.
 export const CAREER_BREAK = { afterCaseId: "ematic", period: "May 2022 – Jul 2025", label: "Career break" };
 
-// Ankit's open-source AI project. Status stays "In progress" until there is a public repo.
+// Ankit’s open-source AI project. Hidden on the site, llms.txt and resume.json until `repo` is set.
 export const NOW_BUILDING = {
   name: "fresh-context",
   status: "In progress",

@@ -42,16 +42,21 @@ export function GET() {
         endDate: EDUCATION.year,
       },
     ],
-    projects: [
-      {
-        name: NOW_BUILDING.name,
-        description: `${NOW_BUILDING.pitch} ${NOW_BUILDING.how}`,
-        highlights: [`Data path: ${NOW_BUILDING.flow.join(" → ")}`, NOW_BUILDING.metric],
-        keywords: NOW_BUILDING.flow,
-        ...(NOW_BUILDING.repo ? { url: NOW_BUILDING.repo } : {}),
-        type: `Open source (${NOW_BUILDING.status.toLowerCase()})`,
-      },
-    ],
+    // Listed only once the project has a public repo, matching the homepage.
+    ...(NOW_BUILDING.repo
+      ? {
+          projects: [
+            {
+              name: NOW_BUILDING.name,
+              description: `${NOW_BUILDING.pitch} ${NOW_BUILDING.how}`,
+              highlights: [`Data path: ${NOW_BUILDING.flow.join(" → ")}`, NOW_BUILDING.metric],
+              keywords: NOW_BUILDING.flow,
+              url: NOW_BUILDING.repo,
+              type: `Open source (${NOW_BUILDING.status.toLowerCase()})`,
+            },
+          ],
+        }
+      : {}),
     skills: DATA_PATH.map((s) => ({ name: s.stage, keywords: s.items })),
     languages: LANGUAGES.map((l) => ({ language: l.name, fluency: FLUENCY[l.level] ?? l.level })),
     meta: { canonical: absolute("/resume.json"), version: "v1.0.0" },
