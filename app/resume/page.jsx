@@ -1,28 +1,44 @@
-"use client";
-
 import Link from "next/link";
+import DeltaMark from "../components/DeltaMark";
+
+export const metadata = {
+  title: "Résumé",
+  description: "Résumé of Ankit Gupta, Senior Software Engineer, Backend & Data Engineering.",
+};
 
 export default function ResumePage() {
   return (
-    <main className="min-h-screen bg-[#09090b] text-zinc-200 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl md:text-2xl font-semibold">Resume</h1>
-          <Link
-            href="/"
-            className="text-sm px-3 py-2 rounded-lg border border-white/10 hover:bg-white/5 transition-colors"
-          >
-            Back to Home
+    <main className="wrap" style={{ paddingBlock: "24px 32px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          marginBottom: 16,
+        }}
+      >
+        <Link href="/" className="brand">
+          <DeltaMark />
+          Ankit Gupta
+        </Link>
+        <div style={{ display: "flex", gap: 8 }}>
+          <a href="/resume/file" className="btn btn-sm" download="Ankit_Gupta_Resume.pdf">
+            Download PDF
+          </a>
+          <Link href="/" className="btn btn-sm btn-primary">
+            Back to site
           </Link>
         </div>
+      </div>
 
-        <div className="rounded-2xl overflow-hidden border border-white/10 bg-black/40 h-[85vh]">
-          <iframe
-            src="/resume/file"
-            title="Resume PDF"
-            className="w-full h-full"
-          />
-        </div>
+      <div className="figure" style={{ height: "82vh", padding: 8 }}>
+        <iframe
+          src="/resume/file"
+          title="Résumé of Ankit Gupta (PDF)"
+          style={{ width: "100%", height: "100%", border: 0, background: "var(--panel)" }}
+        />
       </div>
     </main>
   );
