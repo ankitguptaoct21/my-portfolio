@@ -19,19 +19,11 @@ export default function FreshnessClocks() {
   const [liveAge, setLiveAge] = useState(0.8);
   const [runs, setRuns] = useState(0);
   const [visible, setVisible] = useState(false);
-  const [reduced, setReduced] = useState(false);
   const rootRef = useRef<HTMLElement>(null);
   const ageRef = useRef(START_AGE);
 
-  // Respect reduced motion: the still frame stays.
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const apply = () => setReduced(mq.matches);
-    apply();
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
-  }, []);
-
+  // Runs for every visitor, including systems that ask for reduced motion
+  // (e.g. Windows with "Animation effects" off), by the site owner's choice.
   // Only run while on screen.
   useEffect(() => {
     const el = rootRef.current;
@@ -42,7 +34,7 @@ export default function FreshnessClocks() {
   }, []);
 
   useEffect(() => {
-    if (!visible || reduced) return;
+    if (!visible) return;
     let base = performance.now() - (ageRef.current / SPEED) * 1000;
     let raf = 0;
     let last = 0;
@@ -65,7 +57,7 @@ export default function FreshnessClocks() {
       cancelAnimationFrame(raf);
       clearInterval(live);
     };
-  }, [visible, reduced]);
+  }, [visible]);
 
   const t = Math.min(1, batchAge / PERIOD);
   const batchStyle = { "--mix": `${Math.round(Math.min(1, t * 1.5) * 100)}%` } as CSSProperties;

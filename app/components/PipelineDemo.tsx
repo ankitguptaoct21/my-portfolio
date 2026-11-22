@@ -54,7 +54,6 @@ export default function PipelineDemo() {
   const [lastLatency, setLastLatency] = useState<number | null>(null);
   const [playing, setPlaying] = useState(true);
   const [visible, setVisible] = useState(false);
-  const [reduced, setReduced] = useState(false);
 
   const seq = useRef(3);
   const cursor = useRef(0);
@@ -154,19 +153,9 @@ export default function PipelineDemo() {
     [later]
   );
 
-  // Respect reduced-motion: no autoplay, the button still works.
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const apply = () => {
-      setReduced(mq.matches);
-      if (mq.matches) setPlaying(false);
-    };
-    apply();
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
-  }, []);
-
-  // Only run while on screen.
+  // Autoplays for every visitor, including systems that ask for reduced motion
+  // (e.g. Windows with "Animation effects" off), by the site owner's choice.
+  // Pause is always available. Only run while on screen.
   useEffect(() => {
     const el = rootRef.current;
     if (!el) return;
@@ -208,16 +197,14 @@ export default function PipelineDemo() {
           <button type="button" className="btn btn-sm btn-primary" onClick={() => emit(true)}>
             Make a change
           </button>
-          {!reduced && (
-            <button
-              type="button"
-              className="btn btn-sm"
-              onClick={() => setPlaying((p) => !p)}
-              aria-pressed={!playing}
-            >
-              {playing ? "Pause" : "Play"}
-            </button>
-          )}
+          <button
+            type="button"
+            className="btn btn-sm"
+            onClick={() => setPlaying((p) => !p)}
+            aria-pressed={!playing}
+          >
+            {playing ? "Pause" : "Play"}
+          </button>
         </div>
       </div>
 

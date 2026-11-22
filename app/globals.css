@@ -1080,12 +1080,6 @@ body:has(.shell) {
   max-width: 64ch;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-  }
-}
+/* Animations run for every visitor, including systems that ask for reduced motion
+   (e.g. Windows with "Animation effects" off). This is the site owner's choice;
+   the live demo keeps a Pause button. */
