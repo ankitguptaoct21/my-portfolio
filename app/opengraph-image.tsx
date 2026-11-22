@@ -70,7 +70,7 @@ export default async function Image() {
             style={{ objectFit: "cover", border: `2px solid ${COBALT}` }}
             alt=""
           />
-          <div style={{ display: "flex", fontSize: 22, color: MUTED }}>In Germany from Jan 2027</div>
+          <div style={{ display: "flex", fontSize: 22, color: MUTED }}>Moving to Germany · Jan 2027</div>
         </div>
       </div>
     ),

@@ -2,12 +2,16 @@
 // Rule: every number and technology here must trace to a line in the résumé
 // (app/assets/Resume_Ankit_Gupta_Senior_Software_Engineer.pdf) or to something Ankit
 // confirmed directly in Nov 2026: PySpark and Spark SQL in Fabric notebooks, the move to
-// Germany on an Opportunity Card in January 2027, and the 2022–2025 career break.
+// Germany in January 2027 (Opportunity Card applied for, not yet granted), and the
+// 2022–2025 career break.
 // Never put example or estimated numbers here as if they were measured results.
+// Wording: "80% lower latency" is not "80% faster". Keep the résumé's phrasing.
 
 export const PROFILE = {
   name: "Ankit Gupta",
   role: "Senior Software Engineer",
+  // Plain job title for the homepage heading.
+  title: "Senior Backend & Data Engineer",
   discipline: "Backend & Data Engineering",
   location: "Bengaluru, India",
   relocation: "Moving to Germany in January 2027",
@@ -17,6 +21,9 @@ export const PROFILE = {
   resumePath: "/resume",
   resumeFile: "/resume/file",
   tagline: "Every change, captured.",
+  // One sentence, no acronyms: what a non-technical recruiter should take away.
+  plain:
+    "I build systems that move data in real time, so AI products and the teams behind them always work with up-to-date information.",
   pitch:
     "I build the real-time data layer AI products run on: CDC pipelines, Kafka streams and lakehouses that keep models and agents supplied with fresh, correct data.",
   // Third-person version of the pitch, for machine-readable profiles.
@@ -26,79 +33,81 @@ export const PROFILE = {
 } as const;
 
 // What a German employer needs to know before the first call.
+// The Opportunity Card is applied for, not granted: keep every permit claim conditional.
 export const GERMANY = {
   arrival: "January 2027",
-  permit: "Opportunity Card",
+  permit: "Opportunity Card applied",
   facts: [
+    { label: "Arriving", value: "January 2027, to live and work in Germany." },
     {
       label: "Work permit",
       value:
-        "Opportunity Card (Chancenkarte) from January 2027. With a qualifying offer it converts to an EU Blue Card inside Germany, with no visa application from abroad.",
+        "Opportunity Card (Chancenkarte) applied for. With a job offer it can be converted to an EU Blue Card inside Germany, with no visa process from abroad.",
     },
     {
       label: "Try first",
       value:
-        "The Opportunity Card allows trial work of up to two weeks per employer, so we can work together before you decide.",
+        "Once the card is granted, trial work of up to two weeks per employer is allowed, so we can work together before you decide.",
     },
     { label: "Location", value: "Anywhere in Germany: on-site, hybrid or remote." },
-    { label: "Start", value: "January 2027." },
     { label: "Languages", value: "English (C1), German (A1, learning), Hindi (native)." },
+    { label: "Degree", value: "B.E. in Computer Science & Engineering, 2017." },
   ],
 };
 
-export type Proof = {
+export type Glance = {
   value: string;
-  unit: string;
-  what: string;
-  how: string;
+  label: string;
+  note: string;
   where: string;
   // Optional absolute baseline, e.g. "45 min → 9 min". Only real, measured values.
   detail?: string;
 };
 
-// Headline numbers, each paired with the mechanism behind it.
-export const PROOF: Proof[] = [
+// The four numbers a recruiter should remember.
+export const GLANCE: Glance[] = [
   {
-    value: "80",
-    unit: "%",
-    what: "lower pipeline latency",
-    how: "CDC on the source database, data gateways and database mirroring on Microsoft Fabric",
-    where: "Brahma AI · 2026",
+    value: "80%",
+    label: "lower pipeline latency",
+    note: "New data arrives in a fifth of the time it used to take.",
+    where: "Brahma AI",
   },
   {
-    value: "~60",
-    unit: "%",
-    what: "more efficient lakehouse tables",
-    how: "Compaction, V-Order, Z-Ordering and VACUUM",
-    where: "Brahma AI · 2026",
+    value: "~60%",
+    label: "more efficient lakehouse tables",
+    note: "Through compaction and a smarter file layout.",
+    where: "Brahma AI",
   },
   {
-    value: "30",
-    unit: "%",
-    what: "lower processing latency",
-    how: "A Kafka producer–consumer architecture",
-    where: "Ematic Solutions · 2025",
+    value: "100k+",
+    label: "data points a week into an AI platform",
+    note: "Pulled in from several third-party marketing apps.",
+    where: "Ematic Solutions",
   },
   {
-    value: "100k",
-    unit: "+",
-    what: "data points a week into an AI platform",
-    how: "A backend pipeline ingesting several third-party marketing apps",
-    where: "Ematic Solutions · 2025",
+    value: "6",
+    label: "junior engineers mentored",
+    note: "With shared coding standards, team velocity rose 20%.",
+    where: "Brahma AI",
+  },
+];
+
+// What I do, in plain words. Tags keep the keywords recruiters and ATS search for.
+export const SERVICES = [
+  {
+    title: "Real-time data pipelines",
+    body: "I capture every change in a database the moment it happens and stream it to where it’s needed, in seconds instead of waiting for the next scheduled copy.",
+    tags: ["CDC", "Apache Kafka", "Event-driven architecture"],
   },
   {
-    value: "10",
-    unit: "+",
-    what: "blockchains behind one wallet service",
-    how: "A reusable crypto library cut new-chain integration time by 60%",
-    where: "Ethos Wallet · 2017–19",
+    title: "Data platforms for AI",
+    body: "I build and tune the lakehouse that AI products, agents and analysts read from, so queries stay fast and storage stays lean.",
+    tags: ["Microsoft Fabric", "PySpark", "Spark SQL", "Lakehouse"],
   },
   {
-    value: "90",
-    unit: "%+",
-    what: "fewer order-status support queries",
-    how: "~5,000 automated email and SMS alerts a day",
-    where: "GreenVeggies · 2020–22",
+    title: "Backend systems",
+    body: "I design APIs and microservices that hold up under real traffic, with tests, documentation and clear coding standards.",
+    tags: ["Node.js", "TypeScript", "NestJS", "PostgreSQL", "AWS"],
   },
 ];
 
@@ -112,8 +121,9 @@ export type Case = {
   // ISO year-month, for machine-readable formats (resume.json). No end means current.
   start: string;
   end?: string;
-  headline: string;
-  context: string;
+  // Two plain sentences for the homepage. `built` and `results` keep the full detail
+  // for llms.txt and resume.json.
+  highlights: string[];
   built: string[];
   results: { value: string; label: string }[];
   stack: string[];
@@ -128,9 +138,10 @@ export const CASES: Case[] = [
     role: "Senior Software Engineer",
     period: "Feb 2026 – now",
     start: "2026-02",
-    headline: "Fresh, ready-to-use data for an AI media platform",
-    context:
-      "Several teams needed the same source data, ready to consume and close to real time.",
+    highlights: [
+      "Built real-time (CDC) data pipelines on Microsoft Fabric that cut pipeline latency by 80%.",
+      "Made the lakehouse tables about 60% more efficient, and mentor six junior engineers.",
+    ],
     built: [
       "Architected and deployed ELT pipelines on Microsoft Fabric using CDC on the source database, data gateways and database mirroring.",
       "Tuned the lakehouse with compaction, V-Order, Z-Ordering and VACUUM.",
@@ -142,7 +153,7 @@ export const CASES: Case[] = [
       { value: "~60%", label: "more efficient tables" },
       { value: "+20%", label: "team velocity" },
     ],
-    stack: ["Microsoft Fabric", "CDC", "Lakehouse", "PySpark", "Spark SQL", "Apache Kafka", "Node.js", "TypeScript"],
+    stack: ["Microsoft Fabric", "CDC", "PySpark", "Spark SQL", "Apache Kafka", "TypeScript"],
   },
   {
     id: "ematic",
@@ -153,9 +164,10 @@ export const CASES: Case[] = [
     period: "Aug – Dec 2025",
     start: "2025-08",
     end: "2025-12",
-    headline: "Feeding a marketing AI from many third-party apps",
-    context:
-      "The AI platform depended on data spread across several third-party marketing apps.",
+    highlights: [
+      "Built a pipeline that feeds an AI marketing platform 100,000+ data points a week.",
+      "Designed a Kafka producer–consumer setup that cut processing latency by 30%.",
+    ],
     built: [
       "Built a scalable backend pipeline that ingests data from several third-party marketing apps.",
       "Designed a Kafka producer–consumer architecture for resilience.",
@@ -166,7 +178,7 @@ export const CASES: Case[] = [
       { value: "+25%", label: "performance" },
       { value: "−30%", label: "processing latency" },
     ],
-    stack: ["Apache Kafka", "Data pipelines", "Microservices", "Third-party APIs"],
+    stack: ["Apache Kafka", "Data pipelines", "Microservices"],
   },
   {
     id: "greenveggies",
@@ -177,9 +189,10 @@ export const CASES: Case[] = [
     period: "May 2020 – Apr 2022",
     start: "2020-05",
     end: "2022-04",
-    headline: "Led the backend of a large-scale B2B e-commerce platform",
-    context:
-      "Order processing, inventory and customer updates needed to run with less manual work.",
+    highlights: [
+      "Led the backend; a redesigned admin dashboard raised order-processing performance by 35%.",
+      "Automated about 5,000 customer alerts a day, cutting order-status support queries by 90%+.",
+    ],
     built: [
       "Led backend development and introduced automated testing frameworks that reduced production bugs.",
       "Redesigned the admin dashboard with end-to-end operational features.",
@@ -190,7 +203,7 @@ export const CASES: Case[] = [
       { value: "−85%", label: "costs" },
       { value: "−90%+", label: "order-status queries" },
     ],
-    stack: ["Backend lead", "Automated testing", "SendGrid", "MSG91"],
+    stack: ["Node.js", "Automated testing", "SendGrid", "MSG91"],
   },
   {
     id: "fandom",
@@ -201,8 +214,10 @@ export const CASES: Case[] = [
     period: "Jul 2019 – Apr 2020",
     start: "2019-07",
     end: "2020-04",
-    headline: "Core services for a fast-growing fantasy e-sports app",
-    context: "Referrals and score feeds had to hold up while the user base grew quickly.",
+    highlights: [
+      "Built and load-tested the referral and score-feed services of an app that reached 30,000+ users in six months.",
+      "Wrote OpenAPI documentation that shortened the development cycle by 25%.",
+    ],
     built: [
       "Built, scaled and load-tested the core microservices for user referrals and score feeds.",
       "Wrote Swagger/OpenAPI documentation that cut inter-team dependencies.",
@@ -211,7 +226,7 @@ export const CASES: Case[] = [
       { value: "30k+", label: "users in six months" },
       { value: "−25%", label: "development cycle" },
     ],
-    stack: ["Microservices", "Load testing", "Swagger / OpenAPI"],
+    stack: ["Microservices", "Load testing", "OpenAPI"],
   },
   {
     id: "ethos",
@@ -222,8 +237,10 @@ export const CASES: Case[] = [
     period: "Jun 2017 – Jun 2019",
     start: "2017-06",
     end: "2019-06",
-    headline: "One wallet service for 10+ blockchains",
-    context: "Each new blockchain needed its own key, seed and mnemonic handling.",
+    highlights: [
+      "Put 10+ blockchains behind one Node.js wallet service.",
+      "Built a reusable crypto library that cut new-blockchain integration time by 60%.",
+    ],
     built: [
       "Integrated 10+ blockchains (BTC, ETH, XRP and others), their forks and ERC-20 tokens into a single Node.js wallet service.",
       "Built a reusable cryptographic library for key, seed and mnemonic generation.",
@@ -233,33 +250,18 @@ export const CASES: Case[] = [
       { value: "−60%", label: "new-chain integration time" },
       { value: "25k+", label: "transactions a day" },
     ],
-    stack: ["Node.js", "Bitcoin", "Ethereum", "ERC-20", "Cryptography"],
+    stack: ["Node.js", "Bitcoin", "Ethereum", "Cryptography"],
   },
 ];
 
 // Shown as a slim row in the work list, between the two roles it sits between.
 export const CAREER_BREAK = { afterCaseId: "ematic", period: "May 2022 – Jul 2025", label: "Career break" };
 
-// Why this work matters for AI products. Each claim ties to a résumé result or a public rule.
-export const AI_PILLARS = [
-  {
-    title: "Fresh context",
-    body: "A model answers from whatever data reached it last. Change data capture reads each change from the database log as it happens, instead of waiting for the next batch copy. At Brahma AI, CDC with database mirroring on Microsoft Fabric cut pipeline latency by 80%.",
-  },
-  {
-    title: "Traceable data",
-    body: "CDC reads every change in log order, and every lakehouse write is a new table version. That record is the basis for what the EU AI Act (Article 10) asks of high-risk AI systems: documented data origin and preparation.",
-  },
-  {
-    title: "Efficient storage",
-    body: "Models, agents and analysts read the same tables. Compaction, V-Order, Z-Ordering and VACUUM made Brahma AI’s lakehouse tables about 60% more efficient.",
-  },
-];
-
 // Ankit's open-source AI project. Status stays "In progress" until there is a public repo.
 export const NOW_BUILDING = {
   name: "fresh-context",
   status: "In progress",
+  plain: "An open-source project that keeps an AI assistant’s knowledge up to date within seconds of a change in the database.",
   pitch: "An open-source pipeline that keeps an AI agent’s knowledge seconds behind the database.",
   how: "The design: Postgres changes flow through CDC and Kafka into a vector index, and an MCP server lets any agent search it, with each answer carrying the age of the data behind it. I’ll publish the code and the measured latency here.",
   flow: ["Postgres", "CDC", "Kafka", "Embeddings", "Vector index", "MCP server", "AI agent"],
@@ -267,37 +269,28 @@ export const NOW_BUILDING = {
   repo: null as string | null,
 };
 
-// The stack, grouped by where it sits on the path data takes.
+// The stack, grouped by where it sits on the path data takes. `label` is the plain heading.
 export const DATA_PATH = [
-  { stage: "Capture", items: ["CDC", "Data gateways", "Database mirroring", "Third-party APIs"] },
-  { stage: "Move", items: ["Apache Kafka", "AWS SQS", "Event-driven architecture", "REST", "gRPC"] },
+  { stage: "Capture", label: "Data capture", items: ["CDC", "Data gateways", "Database mirroring", "Third-party APIs"] },
+  {
+    stage: "Move",
+    label: "Streaming & APIs",
+    items: ["Apache Kafka", "AWS SQS", "Event-driven architecture", "REST", "gRPC"],
+  },
   {
     stage: "Store",
+    label: "Storage & queries",
     items: ["Microsoft Fabric", "Lakehouse (V-Order, Z-Ordering)", "Spark SQL", "PostgreSQL", "MongoDB", "Redis"],
   },
   {
     stage: "Build",
+    label: "Languages & frameworks",
     items: ["Python (PySpark)", "TypeScript", "JavaScript", "Node.js", "NestJS", "Express.js", "React"],
   },
-  { stage: "Ship", items: ["Docker", "Kubernetes", "AWS (EC2, S3, Lambda)", "CI/CD", "TDD", "Application security"] },
-];
-
-export const PRINCIPLES = [
   {
-    title: "Capture the change, not the table.",
-    body: "Copying whole tables on a schedule makes everyone wait. Reading changes at the source is how pipeline latency at Brahma AI dropped by 80%.",
-  },
-  {
-    title: "Storage layout is a performance feature.",
-    body: "Compaction, V-Order, Z-Ordering and VACUUM made the lakehouse tables about 60% more efficient without changing a single query.",
-  },
-  {
-    title: "Write the contract down.",
-    body: "Clear OpenAPI docs at Fandom Sports removed inter-team waiting and cut the development cycle by 25%.",
-  },
-  {
-    title: "Standards scale better than heroics.",
-    body: "Shared coding standards and a testing strategy, plus mentoring six engineers, raised team velocity by 20%.",
+    stage: "Ship",
+    label: "Cloud & DevOps",
+    items: ["Docker", "Kubernetes", "AWS (EC2, S3, Lambda)", "CI/CD", "TDD", "Application security"],
   },
 ];
 

@@ -2,11 +2,10 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
-// FIG. 2: how old the data is, moved two ways. An hourly batch copy climbs toward an hour
-// before the next run resets it; change data capture stays around a second behind.
-// Simulated at 60× speed: one real second is one simulated minute.
+// Why real time matters: how old the data is when it's copied once an hour,
+// versus captured as it changes. Simulated at 60× speed (one second = one minute).
 const SPEED = 60;
-const PERIOD = 3600; // seconds between batch runs
+const PERIOD = 3600; // seconds between hourly copies
 const START_AGE = 23 * 60 + 41; // the still frame shown before the clocks start
 
 const mmss = (age: number) => {
@@ -17,7 +16,7 @@ const mmss = (age: number) => {
 
 export default function FreshnessClocks() {
   const [batchAge, setBatchAge] = useState(START_AGE);
-  const [cdcAge, setCdcAge] = useState(0.8);
+  const [liveAge, setLiveAge] = useState(0.8);
   const [runs, setRuns] = useState(0);
   const [visible, setVisible] = useState(false);
   const [reduced, setReduced] = useState(false);
@@ -61,10 +60,10 @@ export default function FreshnessClocks() {
       setBatchAge(age);
     };
     raf = requestAnimationFrame(frame);
-    const cdc = setInterval(() => setCdcAge(0.3 + Math.random() * 1.1), 900);
+    const live = setInterval(() => setLiveAge(0.3 + Math.random() * 1.1), 900);
     return () => {
       cancelAnimationFrame(raf);
-      clearInterval(cdc);
+      clearInterval(live);
     };
   }, [visible, reduced]);
 
@@ -72,33 +71,32 @@ export default function FreshnessClocks() {
   const batchStyle = { "--mix": `${Math.round(Math.min(1, t * 1.5) * 100)}%` } as CSSProperties;
 
   return (
-    <figure ref={rootRef} className="figure fresh" aria-labelledby="fig2-title">
-      <figcaption className="fresh-top">
-        <p id="fig2-title" className="mono fig-caption">
-          Fig. 2 · How old is the data your AI reads?
-        </p>
-        <p className="fresh-sub">
-          Simulated at 60× speed: the same table, moved two ways. Both bars share one scale, an hour.
+    <figure ref={rootRef} className="card fresh" aria-labelledby="fresh-title">
+      <figcaption className="fresh-head">
+        <h3 id="fresh-title">Why real time matters</h3>
+        <p>
+          How old is the data your AI is reading right now? Here is the same table, copied once an hour versus
+          captured as it changes. Simulated at 60× speed.
         </p>
       </figcaption>
 
       <p className="sr-only">
-        With an hourly batch copy, data is up to an hour old before the next run. With change data capture it
-        stays about a second old.
+        Copied once an hour, the data is up to an hour old before the next copy. Captured in real time, it stays
+        about a second old.
       </p>
 
       <div className="fresh-grid" aria-hidden="true">
         <div key={runs} className={runs ? "clock clock-batch ran" : "clock clock-batch"} style={batchStyle}>
-          <p className="mono clock-label">Hourly batch copy</p>
-          <p className="display clock-num tnum">{mmss(batchAge)}</p>
-          <p className="clock-unit">minutes : seconds old</p>
+          <p className="clock-label">Copied once an hour</p>
+          <p className="clock-num tnum">{mmss(batchAge)}</p>
+          <p className="clock-unit">minutes old</p>
           <div className="clock-bar">
             <span style={{ width: `${Math.max(1, t * 100).toFixed(1)}%` }} />
           </div>
         </div>
-        <div className="clock clock-cdc">
-          <p className="mono clock-label">Change data capture</p>
-          <p className="display clock-num tnum">{cdcAge.toFixed(1)}</p>
+        <div className="clock clock-live">
+          <p className="clock-label">Captured in real time · what I build</p>
+          <p className="clock-num tnum">{liveAge.toFixed(1)}</p>
           <p className="clock-unit">seconds old</p>
           <div className="clock-bar">
             <span style={{ width: "1%" }} />
