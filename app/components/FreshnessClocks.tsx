@@ -75,8 +75,8 @@ export default function FreshnessClocks() {
       <figcaption className="fresh-head">
         <h3 id="fresh-title">Why real time matters</h3>
         <p>
-          How old is the data your AI is reading right now? Here is the same table, copied once an hour versus
-          captured as it changes. Simulated at 60× speed.
+          How old is the data your AI is reading right now? Below is the same table, copied once an hour versus
+          captured as it changes. This simulation runs at 60× speed.
         </p>
       </figcaption>
 

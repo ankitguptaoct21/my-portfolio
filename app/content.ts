@@ -36,13 +36,13 @@ export const PROFILE = {
 // The Opportunity Card is applied for, not granted: keep every permit claim conditional.
 export const GERMANY = {
   arrival: "January 2027",
-  permit: "Opportunity Card applied",
+  permit: "Opportunity Card: applied",
   facts: [
     { label: "Arriving", value: "January 2027, to live and work in Germany." },
     {
       label: "Work permit",
       value:
-        "Opportunity Card (Chancenkarte) applied for. With a job offer it can be converted to an EU Blue Card inside Germany, with no visa process from abroad.",
+        "I have applied for an Opportunity Card (Chancenkarte). With a qualifying job offer, it can be converted into an EU Blue Card inside Germany, with no visa process from abroad.",
     },
     {
       label: "Try first",
@@ -75,19 +75,19 @@ export const GLANCE: Glance[] = [
   {
     value: "~60%",
     label: "more efficient lakehouse tables",
-    note: "Through compaction and a smarter file layout.",
+    note: "Achieved through compaction and a smarter file layout.",
     where: "Brahma AI",
   },
   {
     value: "100k+",
-    label: "data points a week into an AI platform",
+    label: "data points fed into an AI platform each week",
     note: "Pulled in from several third-party marketing apps.",
     where: "Ematic Solutions",
   },
   {
     value: "6",
     label: "junior engineers mentored",
-    note: "With shared coding standards, team velocity rose 20%.",
+    note: "With shared coding standards and a testing strategy, team velocity rose by 20%.",
     where: "Brahma AI",
   },
 ];
@@ -96,7 +96,7 @@ export const GLANCE: Glance[] = [
 export const SERVICES = [
   {
     title: "Real-time data pipelines",
-    body: "I capture every change in a database the moment it happens and stream it to where it’s needed, in seconds instead of waiting for the next scheduled copy.",
+    body: "I capture every change in a database the moment it happens and stream it to where it’s needed within seconds, so nobody has to wait for the next scheduled copy.",
     tags: ["CDC", "Apache Kafka", "Event-driven architecture"],
   },
   {
@@ -140,7 +140,7 @@ export const CASES: Case[] = [
     start: "2026-02",
     highlights: [
       "Built real-time (CDC) data pipelines on Microsoft Fabric that cut pipeline latency by 80%.",
-      "Made the lakehouse tables about 60% more efficient, and mentor six junior engineers.",
+      "Made the lakehouse tables about 60% more efficient and mentored six junior engineers.",
     ],
     built: [
       "Architected and deployed ELT pipelines on Microsoft Fabric using CDC on the source database, data gateways and database mirroring.",
@@ -165,7 +165,7 @@ export const CASES: Case[] = [
     start: "2025-08",
     end: "2025-12",
     highlights: [
-      "Built a pipeline that feeds an AI marketing platform 100,000+ data points a week.",
+      "Built a pipeline that fed an AI marketing platform more than 100,000 data points a week.",
       "Designed a Kafka producer–consumer setup that cut processing latency by 30%.",
     ],
     built: [
@@ -190,8 +190,8 @@ export const CASES: Case[] = [
     start: "2020-05",
     end: "2022-04",
     highlights: [
-      "Led the backend; a redesigned admin dashboard raised order-processing performance by 35%.",
-      "Automated about 5,000 customer alerts a day, cutting order-status support queries by 90%+.",
+      "Led the backend and redesigned the admin dashboard, raising order-processing performance by 35%.",
+      "Automated about 5,000 customer alerts a day, cutting order-status support queries by more than 90%.",
     ],
     built: [
       "Led backend development and introduced automated testing frameworks that reduced production bugs.",
@@ -238,7 +238,7 @@ export const CASES: Case[] = [
     start: "2017-06",
     end: "2019-06",
     highlights: [
-      "Put 10+ blockchains behind one Node.js wallet service.",
+      "Integrated 10+ blockchains into a single Node.js wallet service.",
       "Built a reusable crypto library that cut new-blockchain integration time by 60%.",
     ],
     built: [

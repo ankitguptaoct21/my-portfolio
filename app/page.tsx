@@ -252,7 +252,7 @@ export default function Home() {
           <div className="wrap">
             <div className="section-head">
               <p className="eyebrow">Hiring me in Germany</p>
-              <h2 className="section-title">The answers before you have to ask.</h2>
+              <h2 className="section-title">Answers before you have to ask.</h2>
             </div>
             <dl className="rows">
               {GERMANY.facts.map((f) => (
@@ -275,7 +275,7 @@ export default function Home() {
             <h2 className="contact-title">Let’s talk.</h2>
             <p className="contact-lede">
               I’m looking for senior data and backend engineering roles in Germany, especially where data feeds AI
-              products. Email reaches me fastest.
+              products. Email is the fastest way to reach me.
             </p>
             <div className="contact-row">
               <a href={`mailto:${PROFILE.email}`} className="btn btn-primary">
