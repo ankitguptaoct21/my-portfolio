@@ -233,15 +233,23 @@ export default function Home() {
           </h1>
           <p className="lede side-lede">{PROFILE.plain}</p>
           <StatusPills className="side-pills" />
+          {/* On phones these three always share one line; "me" and "View" drop only below ~300px. */}
           <div className="side-actions">
             <a href={`mailto:${PROFILE.email}`} className="btn btn-sm btn-primary">
-              <Mail size={15} aria-hidden="true" /> Email me
+              <Mail size={15} aria-hidden="true" />
+              <span className="btn-label">
+                Email<span className="btn-more"> me</span>
+              </span>
             </a>
             <a href={PROFILE.resumePath} className="btn btn-sm">
-              <FileText size={15} aria-hidden="true" /> View CV
+              <FileText size={15} aria-hidden="true" />
+              <span className="btn-label">
+                <span className="btn-more">View </span>CV
+              </span>
             </a>
             <a href={PROFILE.linkedin} className="btn btn-sm" target="_blank" rel="noreferrer">
-              LinkedIn <ArrowUpRight size={14} aria-hidden="true" />
+              <span className="btn-label">LinkedIn</span>
+              <ArrowUpRight size={14} aria-hidden="true" />
             </a>
             <a href={PROFILE.github} className="btn btn-sm side-github" target="_blank" rel="noreferrer">
               GitHub <ArrowUpRight size={14} aria-hidden="true" />
