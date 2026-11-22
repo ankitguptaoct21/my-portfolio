@@ -19,6 +19,8 @@ export default function FreshnessClocks() {
   const [liveAge, setLiveAge] = useState(0.8);
   const [runs, setRuns] = useState(0);
   const [visible, setVisible] = useState(false);
+  // Autoplays; the Pause button stops both clocks and Play resumes from the same age.
+  const [paused, setPaused] = useState(false);
   const rootRef = useRef<HTMLElement>(null);
   const ageRef = useRef(START_AGE);
 
@@ -34,7 +36,7 @@ export default function FreshnessClocks() {
   }, []);
 
   useEffect(() => {
-    if (!visible) return;
+    if (!visible || paused) return;
     let base = performance.now() - (ageRef.current / SPEED) * 1000;
     let raf = 0;
     let last = 0;
@@ -57,7 +59,7 @@ export default function FreshnessClocks() {
       cancelAnimationFrame(raf);
       clearInterval(live);
     };
-  }, [visible]);
+  }, [visible, paused]);
 
   const t = Math.min(1, batchAge / PERIOD);
   const batchStyle = { "--mix": `${Math.round(Math.min(1, t * 1.5) * 100)}%` } as CSSProperties;
@@ -66,6 +68,14 @@ export default function FreshnessClocks() {
     <figure ref={rootRef} className="card fresh" aria-labelledby="fresh-title">
       <figcaption className="fresh-head">
         <h3 id="fresh-title">Why real time matters</h3>
+        <button
+          type="button"
+          className="btn btn-sm fresh-toggle"
+          onClick={() => setPaused((p) => !p)}
+          aria-pressed={paused}
+        >
+          {paused ? "Play" : "Pause"}
+        </button>
         <p>
           How old is the data your AI is reading right now? Below is the same table, copied once an hour versus
           captured as it changes. This simulation runs at 60× speed.

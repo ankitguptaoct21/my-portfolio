@@ -1,5 +1,6 @@
 import Link from "next/link";
 import DeltaMark from "../components/DeltaMark";
+import FullscreenToggle from "../components/FullscreenToggle";
 
 export const metadata = {
   title: "Résumé",
@@ -23,7 +24,8 @@ export default function ResumePage() {
           <DeltaMark />
           Ankit Gupta
         </Link>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className="resume-actions">
+          <FullscreenToggle targetId="resume-viewer" fallbackHref="/resume/file" />
           <a href="/resume/file" className="btn btn-sm" download="Ankit_Gupta_Resume.pdf">
             Download PDF
           </a>
@@ -33,12 +35,14 @@ export default function ResumePage() {
         </div>
       </div>
 
-      <div className="figure" style={{ height: "82vh", padding: 8 }}>
+      {/* Height and padding live in CSS (.resume-viewer) so full screen can override them. */}
+      <div id="resume-viewer" className="figure resume-viewer">
         <iframe
           src="/resume/file"
           title="Résumé of Ankit Gupta (PDF)"
           style={{ width: "100%", height: "100%", border: 0, background: "var(--panel)" }}
         />
+        <FullscreenToggle targetId="resume-viewer" fallbackHref="/resume/file" variant="exit" />
       </div>
     </main>
   );

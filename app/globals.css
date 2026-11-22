@@ -570,16 +570,24 @@ body:has(.shell) {
   margin: 0;
   overflow: hidden;
 }
+/* Title and Pause share the top row (Pause top-right); the explanation spans below. */
 .fresh-head {
   display: grid;
-  gap: 4px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 16px;
   padding: 18px 20px 0;
 }
 .fresh-head h3 {
   font-size: 18px;
   font-weight: 700;
 }
+.fresh-toggle {
+  grid-column: 2;
+  grid-row: 1;
+}
 .fresh-head p {
+  grid-column: 1 / -1;
   color: var(--ink-2);
   font-size: 15px;
   max-width: 70ch;
@@ -1078,6 +1086,49 @@ body:has(.shell) {
   font-size: 15.5px;
   line-height: 1.5;
   max-width: 64ch;
+}
+
+/* ---------- Résumé page: viewer + full screen ---------- */
+
+.resume-actions {
+  display: flex;
+  flex-wrap: wrap; /* only kicks in on extremely narrow screens (under ~310px) */
+  gap: 8px;
+}
+.resume-viewer {
+  height: 82vh;
+  padding: 8px;
+}
+/* Full screen: the PDF fills the monitor edge to edge. (Separate rules: an unknown
+   prefixed selector would invalidate a combined one.) */
+.resume-viewer:fullscreen {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--paper);
+}
+.resume-viewer:-webkit-full-screen {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--paper);
+}
+.fs-exit {
+  position: absolute;
+  right: max(28px, env(safe-area-inset-right, 0px));
+  bottom: max(24px, env(safe-area-inset-bottom, 0px));
+  z-index: 2;
+  box-shadow: 0 6px 20px rgba(12, 23, 38, 0.3);
+}
+/* Phones: the full-screen button shows only its icon, so all three stay on one line. */
+@media (max-width: 639.98px) {
+  .fs-enter {
+    width: 38px;
+    padding-inline: 0;
+  }
+  .fs-enter .fs-label {
+    display: none;
+  }
 }
 
 /* Animations run for every visitor, including systems that ask for reduced motion
