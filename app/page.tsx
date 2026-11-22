@@ -1,5 +1,6 @@
 import { Fragment, type ReactNode } from "react";
 import {
+  ArrowRight,
   ArrowUpRight,
   Briefcase,
   Database,
@@ -31,6 +32,9 @@ import CopyEmail from "./components/CopyEmail";
 import DeltaMark from "./components/DeltaMark";
 
 const SERVICE_ICONS = [Zap, Database, Server];
+
+// Employer names from the résumé, newest first, e.g. "Deqode Solutions (Techracers)" → "Deqode".
+const EMPLOYERS = [...new Set(CASES.map((c) => c.company.split(" ")[0]))];
 
 const FACT_ICONS: Record<string, ReactNode> = {
   Arriving: <Plane size={18} aria-hidden="true" />,
@@ -85,7 +89,20 @@ const overview = (
       <p className="lede">{PROFILE.plain}</p>
       <StatusPills />
     </div>
-    <PanelHead eyebrow="Overview" title="Results at a glance" />
+    <div className="ov-hero">
+      <p className="eyebrow">Overview</p>
+      <h2 className="ov-thesis">{PROFILE.thesis}</h2>
+      <div className="ov-strip">
+        <p className="ov-employers">
+          <span>Experience at</span> {EMPLOYERS.join(" · ")}
+        </p>
+        {/* A plain #hash link: the Tabs component switches to the Live demo tab on hashchange. */}
+        <a href="#demo" className="ov-live">
+          See it live <ArrowRight size={15} aria-hidden="true" />
+        </a>
+      </div>
+    </div>
+    <h3 className="sr-only">Results at a glance</h3>
     <div className="glance">
       {GLANCE.map((g) => (
         <div key={g.label} className="stat">

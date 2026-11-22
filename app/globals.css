@@ -517,6 +517,52 @@ body:has(.shell) {
 
 /* ---------- Overview: numbers + clocks ---------- */
 
+/* Thesis line, employer strip and a link to the live demo. */
+.ov-hero {
+  display: grid;
+  gap: 4px;
+}
+.ov-thesis {
+  font-family: var(--font-display-stack);
+  font-size: clamp(22px, 2.2vw, 28px);
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.ov-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin-top: 4px;
+}
+.ov-employers {
+  font-size: 14.5px;
+  color: var(--ink-2);
+}
+.ov-employers span {
+  margin-right: 6px;
+  font-weight: 650;
+  color: var(--ink-3);
+}
+.ov-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--cobalt-soft);
+  color: var(--cobalt);
+  font-size: 14.5px;
+  font-weight: 650;
+  transition: background-color 0.15s;
+}
+.ov-live:hover {
+  background: color-mix(in srgb, var(--cobalt) 18%, transparent);
+}
+
 .glance {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

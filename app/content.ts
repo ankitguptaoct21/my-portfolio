@@ -21,6 +21,8 @@ export const PROFILE = {
   resumePath: "/resume",
   resumeFile: "/resume/file",
   tagline: "Every change, captured.",
+  // The one-line thesis at the top of Overview. Backed by the résumé's pitch; no unmeasured claims.
+  thesis: "I keep the data behind AI products fresh and correct.",
   // One sentence, no acronyms: what a non-technical recruiter should take away.
   plain:
     "I build systems that move data in real time, so AI products and the teams behind them always work with up-to-date information.",
