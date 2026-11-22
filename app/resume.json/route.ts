@@ -17,7 +17,6 @@ export function GET() {
     basics: {
       name: PROFILE.name,
       label: `${PROFILE.role}, ${PROFILE.discipline}`,
-      image: absolute("/ankit-gupta.jpg"),
       email: PROFILE.email,
       url: SITE_URL,
       summary: `${PROFILE.pitch} ${PROFILE.years} of experience. ${PROFILE.relocation}.`,

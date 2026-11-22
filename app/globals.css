@@ -176,21 +176,6 @@ body {
   color: var(--ink-2);
 }
 
-.status-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--live);
-  box-shadow: 0 0 0 0 var(--live);
-  animation: ping 2.4s ease-out infinite;
-}
-@keyframes ping {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--live) 55%, transparent); }
-  70% { box-shadow: 0 0 0 8px transparent; }
-  100% { box-shadow: 0 0 0 0 transparent; }
-}
-
 /* ---------- header ---------- */
 
 .site-header {
@@ -248,31 +233,11 @@ body {
 .hero {
   padding-block: clamp(28px, 6vw, 80px) clamp(32px, 5vw, 56px);
 }
-.hero-grid {
-  display: grid;
-  gap: 40px;
-  align-items: center;
-}
-@media (min-width: 960px) {
-  .hero-grid {
-    grid-template-columns: minmax(0, 1fr) 340px;
-    gap: 64px;
-  }
-}
 .hero-text {
   display: grid;
   justify-items: start;
   gap: 18px;
   min-width: 0;
-}
-.avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  object-fit: cover;
-  object-position: 50% 15%;
-  border: 2px solid var(--panel);
-  box-shadow: 0 0 0 1px var(--rule);
 }
 .hero-h1 {
   display: grid;
@@ -328,33 +293,6 @@ body {
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 4px;
-}
-.hero-photo {
-  display: none;
-  margin: 0;
-}
-@media (min-width: 960px) {
-  .avatar {
-    display: none;
-  }
-  .hero-photo {
-    display: grid;
-    gap: 12px;
-  }
-  .hero-photo img {
-    width: 100%;
-    height: auto;
-    border-radius: 20px;
-    border: 1px solid var(--rule);
-    box-shadow: var(--shadow);
-  }
-  .hero-photo figcaption {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 14px;
-    color: var(--ink-2);
-  }
 }
 
 /* ---------- sections ---------- */

@@ -1,5 +1,4 @@
 import { Fragment, type ReactNode } from "react";
-import Image from "next/image";
 import {
   ArrowUpRight,
   Briefcase,
@@ -89,17 +88,8 @@ export default function Home() {
       <main id="top">
         {/* ---------- Hero: who, what, status, how to reach ---------- */}
         <section className="hero">
-          <div className="wrap hero-grid">
+          <div className="wrap">
             <div className="hero-text">
-              <Image
-                className="avatar"
-                src="/ankit-gupta.jpg"
-                alt=""
-                width={144}
-                height={144}
-                sizes="72px"
-                priority
-              />
               <h1 className="hero-h1">
                 <span className="hero-name">{PROFILE.name}</span>
                 <span className="hero-role">{PROFILE.title}</span>
@@ -130,21 +120,6 @@ export default function Home() {
                 </a>
               </div>
             </div>
-
-            <figure className="hero-photo">
-              <Image
-                src="/ankit-gupta.jpg"
-                alt="Portrait of Ankit Gupta"
-                width={660}
-                height={860}
-                sizes="(min-width: 960px) 360px, 0px"
-                priority
-              />
-              <figcaption>
-                <span className="status-dot" aria-hidden="true" />
-                Open to senior roles in Germany
-              </figcaption>
-            </figure>
           </div>
         </section>
 

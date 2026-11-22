@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import { PROFILE, CASES } from "./content";
-import { SITE_URL, absolute } from "./site";
+import { SITE_URL } from "./site";
 import "./globals.css";
 
 // Display: Archivo at an expanded width, like lettering on an engineering drawing.
@@ -88,7 +88,6 @@ const personSchema = {
   jobTitle: `${PROFILE.role}, ${PROFILE.discipline}`,
   description: PROFILE.summary,
   url: SITE_URL,
-  image: absolute("/ankit-gupta.jpg"),
   email: `mailto:${PROFILE.email}`,
   address: { "@type": "PostalAddress", addressLocality: "Bengaluru", addressCountry: "IN" },
   worksFor: { "@type": "Organization", name: CASES[0].company },

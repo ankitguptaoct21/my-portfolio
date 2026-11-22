@@ -1,24 +1,21 @@
 import { ImageResponse } from "next/og";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 
 // The link card people see on LinkedIn, Slack and WhatsApp before they ever open the site.
-export const alt = "Ankit Gupta · Every change, captured. Senior Software Engineer, Backend & Data Engineering.";
+// Same message as the homepage: who, what, proof, Germany. No photo.
+export const alt = "Ankit Gupta, Senior Backend & Data Engineer. Moving to Germany in January 2027.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const INK = "#0c1726";
-const PAPER = "#eef1f4";
+const PAPER = "#f3f5f8";
 const COBALT = "#8f9dff";
-const MUTED = "#9caabd";
+const MUTED = "#a5b2c4";
 
-export default async function Image() {
-  const photo = await readFile(join(process.cwd(), "public", "ankit-gupta.jpg"), "base64");
-
+export default function Image() {
   const stats = [
-    { v: "−80%", l: "pipeline latency" },
+    { v: "80%", l: "lower pipeline latency" },
     { v: "~60%", l: "more efficient tables" },
-    { v: "−30%", l: "Kafka processing latency" },
+    { v: "6 yrs", l: "backend & data" },
   ];
 
   return new ImageResponse(
@@ -28,49 +25,41 @@ export default async function Image() {
           width: "100%",
           height: "100%",
           display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
           background: INK,
           color: PAPER,
-          padding: "56px 64px",
+          padding: "60px 72px",
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <svg width="40" height="40" viewBox="0 0 24 24">
-              <path d="M12 2.5 22.5 21.5H1.5Z" fill={COBALT} />
-              <path d="M12 9.6 17.1 18.6H6.9Z" fill={INK} />
-            </svg>
-            <div style={{ display: "flex", fontSize: 26, letterSpacing: 1, color: MUTED }}>
-              ANKIT GUPTA · REAL-TIME DATA FOR AI
-            </div>
-          </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <svg width="40" height="40" viewBox="0 0 24 24">
+            <path d="M12 2.5 22.5 21.5H1.5Z" fill={COBALT} />
+            <path d="M12 9.6 17.1 18.6H6.9Z" fill={INK} />
+          </svg>
+          <div style={{ display: "flex", fontSize: 26, color: MUTED }}>theankitgupta.com</div>
+        </div>
 
-          <div style={{ display: "flex", flexDirection: "column", fontSize: 104, fontWeight: 800, lineHeight: 1, letterSpacing: -3 }}>
-            <div style={{ display: "flex" }}>
-              Every&nbsp;<span style={{ color: COBALT }}>change</span>,
-            </div>
-            <div style={{ display: "flex" }}>captured.</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", fontSize: 100, fontWeight: 800, lineHeight: 1, letterSpacing: -3 }}>
+            Ankit Gupta
           </div>
-
-          <div style={{ display: "flex", gap: 44 }}>
-            {stats.map((s) => (
-              <div key={s.l} style={{ display: "flex", flexDirection: "column" }}>
-                <div style={{ display: "flex", fontSize: 44, fontWeight: 800 }}>{s.v}</div>
-                <div style={{ display: "flex", fontSize: 22, color: MUTED }}>{s.l}</div>
-              </div>
-            ))}
+          <div style={{ display: "flex", fontSize: 46, fontWeight: 700, color: COBALT }}>
+            Senior Backend &amp; Data Engineer
+          </div>
+          <div style={{ display: "flex", fontSize: 28, color: MUTED, marginTop: 8 }}>
+            Real-time data for AI products · Moving to Germany, January 2027
           </div>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", marginLeft: 48, width: 300 }}>
-          <img
-            src={`data:image/jpeg;base64,${photo}`}
-            width={300}
-            height={391}
-            style={{ objectFit: "cover", border: `2px solid ${COBALT}` }}
-            alt=""
-          />
-          <div style={{ display: "flex", fontSize: 22, color: MUTED }}>Moving to Germany · Jan 2027</div>
+        <div style={{ display: "flex", gap: 56 }}>
+          {stats.map((s) => (
+            <div key={s.l} style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ display: "flex", fontSize: 48, fontWeight: 800 }}>{s.v}</div>
+              <div style={{ display: "flex", fontSize: 22, color: MUTED }}>{s.l}</div>
+            </div>
+          ))}
         </div>
       </div>
     ),
