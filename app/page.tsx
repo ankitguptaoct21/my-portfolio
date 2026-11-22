@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -28,13 +28,29 @@ import {
 import Tabs from "./components/Tabs";
 import FreshnessClocks from "./components/FreshnessClocks";
 import PipelineDemo from "./components/PipelineDemo";
+import ExperienceTimeline, { type TimelineItem } from "./components/ExperienceTimeline";
 import CopyEmail from "./components/CopyEmail";
 import DeltaMark from "./components/DeltaMark";
 
 const SERVICE_ICONS = [Zap, Database, Server];
 
-// Employer names from the résumé, newest first, e.g. "Deqode Solutions (Techracers)" → "Deqode".
-const EMPLOYERS = [...new Set(CASES.map((c) => c.company.split(" ")[0]))];
+// Experience as timeline entries, newest first, with the career break between the roles it sits between.
+const TIMELINE: TimelineItem[] = CASES.flatMap((c): TimelineItem[] => {
+  const job: TimelineItem = {
+    type: "job",
+    id: c.id,
+    period: c.period,
+    role: c.role,
+    company: c.company,
+    product: c.product,
+    kind: c.kind,
+    highlights: c.highlights,
+    stack: c.stack,
+  };
+  return c.id === CAREER_BREAK.afterCaseId
+    ? [job, { type: "break", id: "career-break", period: CAREER_BREAK.period, label: CAREER_BREAK.label }]
+    : [job];
+});
 
 const FACT_ICONS: Record<string, ReactNode> = {
   Arriving: <Plane size={18} aria-hidden="true" />,
@@ -57,10 +73,10 @@ function Tags({ items }: { items: readonly string[] }) {
   );
 }
 
-function PanelHead({ eyebrow, title }: { eyebrow: string; title: string }) {
+// Section title only; the selected tab above already names the section.
+function PanelHead({ title }: { title: string }) {
   return (
     <div className="panel-head">
-      <p className="eyebrow">{eyebrow}</p>
       <h2 className="panel-title">{title}</h2>
     </div>
   );
@@ -90,12 +106,8 @@ const overview = (
       <StatusPills />
     </div>
     <div className="ov-hero">
-      <p className="eyebrow">Overview</p>
       <h2 className="ov-thesis">{PROFILE.thesis}</h2>
       <div className="ov-strip">
-        <p className="ov-employers">
-          <span>Experience at</span> {EMPLOYERS.join(" · ")}
-        </p>
         {/* A plain #hash link: the Tabs component switches to the Live demo tab on hashchange. */}
         <a href="#demo" className="ov-live">
           See it live <ArrowRight size={15} aria-hidden="true" />
@@ -120,7 +132,7 @@ const overview = (
 
 const whatIDo = (
   <>
-    <PanelHead eyebrow="What I do" title="I make sure the right data is in the right place, on time." />
+    <PanelHead title="I make sure the right data is in the right place, on time." />
     <div className="services">
       {SERVICES.map((s, i) => {
         const Icon = SERVICE_ICONS[i];
@@ -158,46 +170,21 @@ const whatIDo = (
 
 const liveDemo = (
   <>
-    <PanelHead eyebrow="Live demo" title="Watch a database change travel to the lakehouse." />
+    <PanelHead title="Watch a database change travel to the lakehouse." />
     <PipelineDemo />
   </>
 );
 
 const experience = (
   <>
-    <PanelHead eyebrow="Experience" title="Where I’ve done it, newest first." />
-    <ol className="jobs">
-      {CASES.map((c) => (
-        <Fragment key={c.id}>
-          <li className="job">
-            <p className="job-when">{c.period}</p>
-            <h3 className="job-title">
-              {c.role} <span>· {c.company}</span>
-            </h3>
-            <p className="job-product">
-              <strong>{c.product}</strong> · {c.kind}
-            </p>
-            <ul className="job-points">
-              {c.highlights.map((h) => (
-                <li key={h}>{h}</li>
-              ))}
-            </ul>
-          </li>
-          {c.id === CAREER_BREAK.afterCaseId && (
-            <li className="job job-break">
-              <p className="job-when">{CAREER_BREAK.period}</p>
-              <p>{CAREER_BREAK.label}</p>
-            </li>
-          )}
-        </Fragment>
-      ))}
-    </ol>
+    <PanelHead title="Where I’ve done it, newest first." />
+    <ExperienceTimeline items={TIMELINE} />
   </>
 );
 
 const skills = (
   <>
-    <PanelHead eyebrow="Skills" title="Tools I work with." />
+    <PanelHead title="Tools I work with." />
     <dl className="rows">
       {DATA_PATH.map((s) => (
         <div key={s.stage} className="row">
@@ -213,7 +200,7 @@ const skills = (
 
 const germany = (
   <>
-    <PanelHead eyebrow="Hiring me in Germany" title="Answers before you have to ask." />
+    <PanelHead title="Answers before you have to ask." />
     <dl className="rows">
       {GERMANY.facts.map((f) => (
         <div key={f.label} className="row">
@@ -232,7 +219,8 @@ const TABS = [
   { id: "overview", label: "Overview", content: overview },
   { id: "what", label: "What I do", content: whatIDo },
   { id: "demo", label: "Live demo", content: liveDemo },
-  { id: "experience", label: "Experience", content: experience },
+  // fill: the panel takes exactly the screen height so only the timeline inside it scrolls.
+  { id: "experience", label: "Experience", content: experience, fill: true },
   { id: "skills", label: "Skills", content: skills },
   { id: "germany", label: "Germany", content: germany },
 ];

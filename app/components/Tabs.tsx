@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
-export type Tab = { id: string; label: string; content: ReactNode };
+// fill: the panel is exactly as tall as the screen area, so a child (e.g. the experience
+// timeline) can scroll on its own while the panel itself never does.
+export type Tab = { id: string; label: string; content: ReactNode; fill?: boolean };
 
 // Old section links (shared before the tabbed layout) still land on the right tab.
 const ALIASES: Record<string, string> = {
@@ -97,7 +99,7 @@ export default function Tabs({ tabs }: { tabs: Tab[] }) {
             id={`panel-${t.id}`}
             aria-labelledby={`tab-${t.id}`}
             hidden={t.id !== active}
-            className="panel"
+            className={t.fill ? "panel panel-fill" : "panel"}
             tabIndex={0}
           >
             {t.content}

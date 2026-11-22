@@ -171,12 +171,6 @@ body:has(.shell) {
   box-shadow: var(--shadow);
 }
 
-.eyebrow {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--cobalt);
-}
-
 .lede {
   font-size: 17px;
   line-height: 1.5;
@@ -544,15 +538,6 @@ body:has(.shell) {
   justify-content: space-between;
   gap: 6px 16px;
   margin-top: 4px;
-}
-.ov-employers {
-  font-size: 14.5px;
-  color: var(--ink-2);
-}
-.ov-employers span {
-  margin-right: 6px;
-  font-weight: 650;
-  color: var(--ink-3);
 }
 .ov-live {
   display: inline-flex;
@@ -1021,38 +1006,193 @@ body:has(.shell) {
   font-weight: 600;
 }
 
-/* ---------- Experience: compact cards ---------- */
+/* ---------- Experience: vertical timeline, newest first ---------- */
 
-.jobs {
-  display: grid;
-  gap: 12px;
+/* The Experience panel is exactly the screen height: heading on top, timeline fills
+   the rest and is the only thing that scrolls. */
+.panel-fill {
+  height: 100%;
+  align-content: stretch;
+  grid-template-rows: auto minmax(0, 1fr) auto;
 }
-@container panel (min-width: 520px) {
-  .jobs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.tl-wrap {
+  position: relative;
+  display: grid;
+  min-height: 0;
+}
+.tl-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  border-top: 1px solid var(--rule);
+}
+.tl-scroll:focus-visible {
+  outline-offset: -2px;
+}
+.tl-inner {
+  position: relative;
+  padding-block: 18px 56px; /* bottom room so the last role can rise above the hint */
+}
+/* Column widths live on .tl-inner so the line and the list share them. */
+.tl-inner {
+  --date-w: 0px;
+  --rail-w: 26px;
+}
+@container panel (min-width: 620px) {
+  .tl-inner {
+    --date-w: 150px;
   }
 }
-@container panel (min-width: 760px) {
-  .jobs {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-.job {
+.tl {
   display: grid;
-  align-content: start;
-  gap: 5px;
-  padding: 14px;
-  background: var(--panel);
-  border: 1px solid var(--rule);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-  min-width: 0;
 }
-.job-when {
+/* One continuous line from the first dot to the last; the fill grows as you scroll. */
+.tl-rail {
+  position: absolute;
+  left: calc(var(--date-w) + var(--rail-w) / 2 - 1px);
+  width: 2px;
+  border-radius: 2px;
+  background: var(--rule);
+  overflow: hidden;
+}
+.tl-fill {
+  display: block;
+  width: 100%;
+  background: var(--cobalt);
+  transition: height 0.12s linear;
+}
+.tl-item,
+.tl-break {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--date-w) var(--rail-w) minmax(0, 1fr);
+}
+.tl-when {
+  display: none;
+  grid-column: 1;
+  padding: 2px 16px 0 0;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink-3);
+  transition: color 0.2s;
+}
+.tl-when-inline {
   font-size: 13.5px;
   font-weight: 600;
   color: var(--ink-3);
+  transition: color 0.2s;
 }
+@container panel (min-width: 620px) {
+  .tl-when {
+    display: block;
+  }
+  .tl-when-inline {
+    display: none;
+  }
+}
+.tl-dot {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  position: relative;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  margin-top: 6px;
+  border-radius: 50%;
+  border: 2px solid var(--rule-strong);
+  background: var(--paper);
+  transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+.tl-item.is-past .tl-dot {
+  border-color: var(--cobalt);
+  background: var(--cobalt);
+}
+.tl-item.is-active .tl-dot {
+  border-color: var(--cobalt);
+  background: var(--cobalt);
+  box-shadow: 0 0 0 5px var(--cobalt-soft);
+  transform: scale(1.15);
+}
+.tl-item.is-active .tl-when,
+.tl-item.is-active .tl-when-inline {
+  color: var(--cobalt);
+}
+.tl-body {
+  grid-column: 3;
+  grid-row: 1;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 0 30px 14px;
+}
+.tl-body .tags {
+  margin-top: 4px;
+}
+/* Career break: the line turns dashed between the two roles it sits between. */
+.tl-break::before {
+  content: "";
+  position: absolute;
+  top: -30px;
+  bottom: 0;
+  left: calc(var(--date-w) + var(--rail-w) / 2 - 1px);
+  width: 2px;
+  z-index: 0;
+  background: repeating-linear-gradient(to bottom, transparent 0 6px, var(--paper) 6px 12px);
+}
+.tl-break .tl-when {
+  font-style: italic;
+  font-weight: 500;
+}
+.tl-break-label {
+  grid-column: 3;
+  padding: 0 0 30px 14px;
+  font-size: 14.5px;
+  font-style: italic;
+  color: var(--ink-3);
+}
+.tl-break-label .tl-when-inline {
+  font-weight: 500;
+}
+/* Scroll hint: a soft fade and a small label, both gone once the end is reached. */
+.tl-wrap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 64px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--paper));
+  transition: opacity 0.25s;
+}
+.tl-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  z-index: 2;
+  transform: translateX(-50%);
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  white-space: nowrap;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.tl-wrap.is-end::after,
+.tl-wrap.is-end .tl-hint {
+  opacity: 0;
+}
+
 .job-title {
   font-size: 16.5px;
   font-weight: 700;
@@ -1091,15 +1231,6 @@ body:has(.shell) {
   border-radius: 50%;
   background: var(--cobalt);
 }
-.job-break {
-  align-content: center;
-  background: transparent;
-  border-style: dashed;
-  box-shadow: none;
-  color: var(--ink-3);
-  font-style: italic;
-}
-
 /* ---------- key–value rows (Skills, Germany) ---------- */
 
 .rows {
