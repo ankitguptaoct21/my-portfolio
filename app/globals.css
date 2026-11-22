@@ -489,6 +489,241 @@ body {
   background: var(--clock);
 }
 
+/* see it working: Source DB → CDC → Kafka → Lakehouse */
+.pipe {
+  margin-top: 20px;
+  overflow: hidden;
+}
+.pipe-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px 24px;
+  padding: 22px 22px 18px;
+  border-bottom: 1px solid var(--rule);
+}
+.pipe-intro {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.pipe-intro h3 {
+  font-size: 20px;
+  font-weight: 700;
+}
+.pipe-intro p {
+  color: var(--ink-2);
+  font-size: 16px;
+  max-width: 62ch;
+}
+.pipe-controls {
+  display: flex;
+  gap: 8px;
+}
+.pipe-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  padding: 18px 22px;
+}
+@media (min-width: 980px) {
+  .pipe-grid {
+    grid-template-columns: 1fr 36px 1fr 36px 1fr 36px 1fr;
+  }
+}
+.stage {
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--paper);
+  min-width: 0;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.stage[data-active="true"] {
+  border-color: var(--cobalt);
+  box-shadow: 0 0 0 3px var(--cobalt-soft);
+}
+.stage-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--rule);
+}
+.stage-name {
+  color: var(--ink);
+  font-weight: 700;
+}
+.stage-sub {
+  color: var(--ink-3);
+  font-size: 11px;
+}
+.stage-body {
+  padding: 8px 12px 12px;
+  font-family: var(--font-mono-stack);
+  font-size: 12.5px;
+  min-height: 150px;
+}
+.ptable {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.ptable th {
+  text-align: left;
+  font-weight: 500;
+  color: var(--ink-3);
+  font-size: 11px;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--rule);
+}
+.ptable td {
+  padding: 5px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+.ptable tr[data-flash] td {
+  animation: rowflash 1.1s ease-out;
+}
+@keyframes rowflash {
+  0% { background: var(--mark); color: var(--on-mark); }
+  100% { background: transparent; }
+}
+.op {
+  display: inline-block;
+  width: 18px;
+  text-align: center;
+  font-weight: 700;
+  color: var(--on-cobalt);
+  background: var(--cobalt);
+  border-radius: 4px;
+  margin-right: 8px;
+}
+.op[data-op="c"] {
+  background: var(--live);
+}
+.log-line {
+  display: flex;
+  align-items: baseline;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--rule);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.log-line:first-child {
+  animation: slidein 0.35s ease-out;
+}
+.log-lsn {
+  color: var(--ink-3);
+  margin-left: auto;
+  padding-left: 8px;
+}
+@keyframes slidein {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+.lane {
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--rule);
+}
+.lane-ticks {
+  display: flex;
+  gap: 3px;
+  overflow: hidden;
+  height: 14px;
+}
+.tick {
+  flex: 0 0 8px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--rule-strong);
+}
+.tick:last-child {
+  background: var(--cobalt);
+}
+.tick[data-new] {
+  animation: tickin 0.4s ease-out;
+}
+@keyframes tickin {
+  from { transform: scaleY(0.2); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.lake-foot {
+  margin-top: 10px;
+  color: var(--ink-3);
+  font-size: 11px;
+  display: grid;
+  gap: 2px;
+}
+.optimize {
+  color: var(--cobalt);
+}
+.conn {
+  position: relative;
+  height: 28px;
+  display: flex;
+  justify-content: center;
+}
+.conn::before {
+  content: "";
+  width: 1px;
+  height: 100%;
+  background: repeating-linear-gradient(var(--rule-strong) 0 4px, transparent 4px 8px);
+}
+.packet {
+  position: absolute;
+  left: calc(50% - 5px);
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cobalt);
+  animation: travel-v 0.34s linear forwards;
+}
+@keyframes travel-v {
+  from { transform: translateY(0); }
+  to { transform: translateY(18px); opacity: 0.2; }
+}
+@media (min-width: 980px) {
+  .conn {
+    height: auto;
+    align-items: center;
+  }
+  .conn::before {
+    width: 100%;
+    height: 1px;
+    background: repeating-linear-gradient(90deg, var(--rule-strong) 0 4px, transparent 4px 8px);
+  }
+  .packet {
+    left: 0;
+    top: calc(50% - 5px);
+    animation-name: travel-h;
+  }
+  @keyframes travel-h {
+    from { transform: translateX(0); }
+    to { transform: translateX(26px); opacity: 0.2; }
+  }
+}
+.pipe-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  padding: 14px 22px;
+  border-top: 1px solid var(--rule);
+  color: var(--ink-2);
+}
+.pipe-readout strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
 /* now building */
 .build {
   display: grid;

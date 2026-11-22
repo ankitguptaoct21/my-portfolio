@@ -25,6 +25,7 @@ import {
   DATA_PATH,
 } from "./content";
 import FreshnessClocks from "./components/FreshnessClocks";
+import PipelineDemo from "./components/PipelineDemo";
 import CopyEmail from "./components/CopyEmail";
 import DeltaMark from "./components/DeltaMark";
 
@@ -168,6 +169,8 @@ export default function Home() {
             </div>
 
             <FreshnessClocks />
+
+            <PipelineDemo />
 
             <article className="card build" aria-labelledby="build-title">
               <div className="build-top">
