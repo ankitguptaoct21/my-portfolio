@@ -1,9 +1,10 @@
-// Single source of truth for everything the site says about Ankit.
+// Single source of truth for the English site, theankitgupta.com, which is for employers
+// in India. Germany is deliberately not mentioned here (Ankit's choice); everything for
+// German employers lives in app/locales/de.ts and is served only on deu.theankitgupta.com.
 // Rule: every number and technology here must trace to a line in the résumé
 // (app/assets/Resume_Ankit_Gupta_Senior_Software_Engineer.pdf) or to something Ankit
-// confirmed directly in Nov 2026: PySpark and Spark SQL in Fabric notebooks, the move to
-// Germany in January 2027 (Opportunity Card applied for, not yet granted), and the
-// 2022–2025 career break.
+// confirmed directly in Nov 2026: PySpark and Spark SQL in Fabric notebooks, the
+// 2022–2025 career break, roles anywhere in India and a 30-day notice period.
 // Never put example or estimated numbers here as if they were measured results.
 // Wording: "80% lower latency" is not "80% faster". Keep the résumé's phrasing.
 
@@ -14,7 +15,9 @@ export const PROFILE = {
   title: "Senior Backend & Data Engineer",
   discipline: "Backend & Data Engineering",
   location: "Bengaluru, India",
-  relocation: "Moving to Germany in January 2027",
+  workSetup: "On-site, hybrid or remote, anywhere in India",
+  noticePeriod: "30 days",
+  availability: "Open to roles anywhere in India: on-site, hybrid or remote. Notice period: 30 days.",
   email: "ankitgupta.oct21@gmail.com",
   linkedin: "https://www.linkedin.com/in/ankit-gupta-oct21/",
   github: "https://github.com/ankitguptaoct21",
@@ -33,29 +36,6 @@ export const PROFILE = {
     "Builds the real-time data layer AI products run on: change data capture (CDC) pipelines, Apache Kafka streams and lakehouses that keep models and agents supplied with fresh, correct data.",
   years: "6 years",
 } as const;
-
-// What a German employer needs to know before the first call.
-// The Opportunity Card is applied for, not granted: keep every permit claim conditional.
-export const GERMANY = {
-  arrival: "January 2027",
-  permit: "Opportunity Card: applied",
-  facts: [
-    { label: "Arriving", value: "January 2027, to live and work in Germany." },
-    {
-      label: "Work permit",
-      value:
-        "I have applied for an Opportunity Card (Chancenkarte). With a qualifying job offer, it can be converted into an EU Blue Card inside Germany, with no visa process from abroad.",
-    },
-    {
-      label: "Try first",
-      value:
-        "Once the card is granted, trial work of up to two weeks per employer is allowed, so we can work together before you decide.",
-    },
-    { label: "Location", value: "Anywhere in Germany: on-site, hybrid or remote." },
-    { label: "Languages", value: "English (C1), German (A1, learning), Hindi (native)." },
-    { label: "Degree", value: "B.E. in Computer Science & Engineering, 2017." },
-  ],
-};
 
 export type Glance = {
   value: string;

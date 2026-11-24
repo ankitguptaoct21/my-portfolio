@@ -20,7 +20,15 @@ const ALIASES: Record<string, string> = {
 
 // One section on screen at a time. Every panel is rendered into the HTML (hidden
 // until selected), so search engines and AI tools still read all of it.
-export default function Tabs({ tabs }: { tabs: Tab[] }) {
+export default function Tabs({
+  tabs,
+  nextLabel = "Next",
+  ariaLabel = "Sections",
+}: {
+  tabs: Tab[];
+  nextLabel?: string;
+  ariaLabel?: string;
+}) {
   const [active, setActive] = useState(tabs[0].id);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const panels = useRef<HTMLDivElement>(null);
@@ -66,7 +74,7 @@ export default function Tabs({ tabs }: { tabs: Tab[] }) {
 
   return (
     <>
-      <div className="tabbar" role="tablist" aria-label="Sections">
+      <div className="tabbar" role="tablist" aria-label={ariaLabel}>
         {tabs.map((t, i) => {
           const on = t.id === active;
           return (
@@ -105,7 +113,7 @@ export default function Tabs({ tabs }: { tabs: Tab[] }) {
             {t.content}
             {i < tabs.length - 1 && (
               <button type="button" className="next-tab" onClick={() => select(tabs[i + 1].id, true)}>
-                Next: {tabs[i + 1].label} <span aria-hidden="true">→</span>
+                {nextLabel}: {tabs[i + 1].label} <span aria-hidden="true">→</span>
               </button>
             )}
           </section>

@@ -1,31 +1,61 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { PIPELINE_EN } from "../locales/ui-en";
 
-// FIG. 1: a simulated change-data-capture pipeline.
+// A simulated change-data-capture pipeline.
 // A row changes in the source database, the change is read from the log,
 // published to a Kafka topic, and merged into a Delta table in the lakehouse.
 
 type Status = "placed" | "packed" | "shipped" | "delivered";
-type Row = { id: number; item: string; status: Status };
-type LogEntry = { seq: number; op: "c" | "u"; id: number; detail: string; lsn: string; you: boolean };
+// `item` is an index into copy.items, so the German site can name the same products.
+type Row = { id: number; item: number; status: Status };
+type Detail = { kind: "insert" } | { kind: "move"; from: Status; to: Status };
+type LogEntry = { seq: number; op: "c" | "u"; id: number; detail: Detail; lsn: string; you: boolean };
+
+// All visible text; the German site passes its own. `locale` formats offsets and latency.
+// lakeFoot uses {v} for the table version and {n} for the small-file count.
+export type PipelineCopy = {
+  locale: string;
+  title: string;
+  intro: string;
+  makeChange: string;
+  pause: string;
+  play: string;
+  source: { name: string; sub: string; aria: string };
+  cdc: { name: string; sub: string; aria: string };
+  kafka: { name: string; sub: string; aria: string; note: string };
+  lake: { name: string; sub: string; aria: string };
+  cols: { id: string; item: string; status: string };
+  status: Record<Status, string>;
+  insert: string;
+  you: string;
+  items: string[];
+  lakeFoot: string;
+  optimize: string;
+  compaction: string;
+  captured: string;
+  latency: string;
+  simulated: string;
+};
+
 
 const FLOW: Status[] = ["placed", "packed", "shipped", "delivered"];
-const ITEMS = ["Espresso beans", "Desk lamp", "Running shoes", "Field notebook", "Wool scarf", "USB-C hub", "Tea sampler", "Bike light"];
+const ITEM_COUNT = 8;
 const PARTITIONS = 3;
 const STEP_MS = [0, 340, 700, 1060];
 
 const INITIAL_ROWS: Row[] = [
-  { id: 1041, item: "Espresso beans", status: "shipped" },
-  { id: 1042, item: "Desk lamp", status: "packed" },
-  { id: 1043, item: "Running shoes", status: "placed" },
-  { id: 1044, item: "Field notebook", status: "packed" },
+  { id: 1041, item: 0, status: "shipped" },
+  { id: 1042, item: 1, status: "packed" },
+  { id: 1043, item: 2, status: "placed" },
+  { id: 1044, item: 3, status: "packed" },
 ];
 
 const INITIAL_LOG: LogEntry[] = [
-  { seq: 3, op: "u", id: 1041, detail: "packed→shipped", lsn: "0/3A7F28", you: false },
-  { seq: 2, op: "u", id: 1044, detail: "placed→packed", lsn: "0/3A7E90", you: false },
-  { seq: 1, op: "c", id: 1043, detail: "insert", lsn: "0/3A7D10", you: false },
+  { seq: 3, op: "u", id: 1041, detail: { kind: "move", from: "packed", to: "shipped" }, lsn: "0/3A7F28", you: false },
+  { seq: 2, op: "u", id: 1044, detail: { kind: "move", from: "placed", to: "packed" }, lsn: "0/3A7E90", you: false },
+  { seq: 1, op: "c", id: 1043, detail: { kind: "insert" }, lsn: "0/3A7D10", you: false },
 ];
 
 const lsnFor = (n: number) => `0/${(0x3a7f28 + n * 0x98).toString(16).toUpperCase()}`;
@@ -33,7 +63,7 @@ const lsnFor = (n: number) => `0/${(0x3a7f28 + n * 0x98).toString(16).toUpperCas
 const bump = (setter: (fn: (a: number[]) => number[]) => void, i: number, d: number) =>
   setter((a) => a.map((v, j) => (j === i ? Math.max(0, v + d) : v)));
 
-export default function PipelineDemo() {
+export default function PipelineDemo({ copy = PIPELINE_EN }: { copy?: PipelineCopy }) {
   const [source, setSource] = useState<Row[]>(INITIAL_ROWS);
   const [lake, setLake] = useState<Row[]>(INITIAL_ROWS);
   const [log, setLog] = useState<LogEntry[]>(INITIAL_LOG);
@@ -83,12 +113,12 @@ export default function PipelineDemo() {
       if (prev.status === "delivered") {
         // Delivered orders leave the view; a new order is inserted (op "c").
         const id = Math.max(...rows.map((r) => r.id)) + 1;
-        next = { id, item: ITEMS[nextItem.current++ % ITEMS.length], status: "placed" };
-        entry = { op: "c", id, detail: "insert", you };
+        next = { id, item: nextItem.current++ % ITEM_COUNT, status: "placed" };
+        entry = { op: "c", id, detail: { kind: "insert" }, you };
       } else {
         const to = FLOW[FLOW.indexOf(prev.status) + 1];
         next = { ...prev, status: to };
-        entry = { op: "u", id: prev.id, detail: `${prev.status}→${to}`, you };
+        entry = { op: "u", id: prev.id, detail: { kind: "move", from: prev.status, to }, you };
       }
       const updated = rows.map((r, j) => (j === idx ? next : r));
       rowsRef.current = updated;
@@ -181,21 +211,22 @@ export default function PipelineDemo() {
     return () => set.forEach(clearTimeout);
   }, []);
 
-  const latencyText = lastLatency === null ? "—" : `${(lastLatency / 1000).toFixed(2)} s`;
+  const latencyText =
+    lastLatency === null
+      ? "—"
+      : `${(lastLatency / 1000).toLocaleString(copy.locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} s`;
+  const describe = (d: Detail) => (d.kind === "insert" ? copy.insert : `${copy.status[d.from]}→${copy.status[d.to]}`);
 
   return (
     <div ref={rootRef} className="card pipe" role="group" aria-labelledby="pipe-title">
       <div className="pipe-top">
         <div className="pipe-intro">
-          <h3 id="pipe-title">See it working</h3>
-          <p>
-            Press “Make a change” to update an order in the source database, then watch the change travel through
-            CDC and Kafka into the lakehouse.
-          </p>
+          <h3 id="pipe-title">{copy.title}</h3>
+          <p>{copy.intro}</p>
         </div>
         <div className="pipe-controls">
           <button type="button" className="btn btn-sm btn-primary" onClick={() => emit(true)}>
-            Make a change
+            {copy.makeChange}
           </button>
           <button
             type="button"
@@ -203,28 +234,28 @@ export default function PipelineDemo() {
             onClick={() => setPlaying((p) => !p)}
             aria-pressed={!playing}
           >
-            {playing ? "Pause" : "Play"}
+            {playing ? copy.pause : copy.play}
           </button>
         </div>
       </div>
 
       <div className="pipe-grid">
-        <section className="stage" data-active={active[0] > 0} aria-label="Source database">
+        <section className="stage" data-active={active[0] > 0} aria-label={copy.source.aria}>
           <header className="stage-head mono">
-            <span className="stage-name">Source DB</span>
-            <span className="stage-sub">orders</span>
+            <span className="stage-name">{copy.source.name}</span>
+            <span className="stage-sub">{copy.source.sub}</span>
           </header>
           <div className="stage-body">
-            <RowsTable rows={source} flash={flashSrc} showItem />
+            <RowsTable rows={source} flash={flashSrc} copy={copy} showItem />
           </div>
         </section>
 
         <Connector n={packets[0]} />
 
-        <section className="stage" data-active={active[1] > 0} aria-label="Change data capture log">
+        <section className="stage" data-active={active[1] > 0} aria-label={copy.cdc.aria}>
           <header className="stage-head mono">
-            <span className="stage-name">CDC</span>
-            <span className="stage-sub">reads the log</span>
+            <span className="stage-name">{copy.cdc.name}</span>
+            <span className="stage-sub">{copy.cdc.sub}</span>
           </header>
           <div className="stage-body">
             {log.map((l) => (
@@ -233,8 +264,8 @@ export default function PipelineDemo() {
                   {l.op}
                 </span>
                 <span>
-                  #{l.id} {l.detail}
-                  {l.you && <span style={{ color: "var(--cobalt)" }}> · you</span>}
+                  #{l.id} {describe(l.detail)}
+                  {l.you && <span style={{ color: "var(--cobalt)" }}> · {copy.you}</span>}
                 </span>
                 <span className="log-lsn">{l.lsn}</span>
               </div>
@@ -244,10 +275,10 @@ export default function PipelineDemo() {
 
         <Connector n={packets[1]} />
 
-        <section className="stage" data-active={active[2] > 0} aria-label="Kafka topic">
+        <section className="stage" data-active={active[2] > 0} aria-label={copy.kafka.aria}>
           <header className="stage-head mono">
-            <span className="stage-name">Kafka</span>
-            <span className="stage-sub">orders.cdc</span>
+            <span className="stage-name">{copy.kafka.name}</span>
+            <span className="stage-sub">{copy.kafka.sub}</span>
           </header>
           <div className="stage-body">
             {ticks.map((lane, p) => (
@@ -258,29 +289,25 @@ export default function PipelineDemo() {
                     <span key={t} className="tick" data-new={i === lane.length - 1 && t > 100 ? "" : undefined} />
                   ))}
                 </span>
-                <span className="tnum">{offsets[p].toLocaleString("en-US")}</span>
+                <span className="tnum">{offsets[p].toLocaleString(copy.locale)}</span>
               </div>
             ))}
-            <p style={{ color: "var(--ink-3)", fontSize: 11, marginTop: 10 }}>
-              keyed by order id · offsets per partition
-            </p>
+            <p style={{ color: "var(--ink-3)", fontSize: 11, marginTop: 10 }}>{copy.kafka.note}</p>
           </div>
         </section>
 
         <Connector n={packets[2]} />
 
-        <section className="stage" data-active={active[3] > 0} aria-label="Lakehouse Delta table">
+        <section className="stage" data-active={active[3] > 0} aria-label={copy.lake.aria}>
           <header className="stage-head mono">
-            <span className="stage-name">Lakehouse</span>
-            <span className="stage-sub">delta table</span>
+            <span className="stage-name">{copy.lake.name}</span>
+            <span className="stage-sub">{copy.lake.sub}</span>
           </header>
           <div className="stage-body">
-            <RowsTable rows={lake} flash={flashLake} />
+            <RowsTable rows={lake} flash={flashLake} copy={copy} />
             <div className="lake-foot tnum">
-              <span>version {version} · small files {smallFiles}</span>
-              <span className={optimized ? "optimize" : undefined}>
-                {optimized ? "OPTIMIZE · V-Order → 1 file" : "compaction when files ≥ 7"}
-              </span>
+              <span>{copy.lakeFoot.replace("{v}", String(version)).replace("{n}", String(smallFiles))}</span>
+              <span className={optimized ? "optimize" : undefined}>{optimized ? copy.optimize : copy.compaction}</span>
             </div>
           </div>
         </section>
@@ -288,12 +315,12 @@ export default function PipelineDemo() {
 
       <div className="pipe-readout mono tnum" aria-live="off">
         <span>
-          Changes captured <strong>{captured}</strong>
+          {copy.captured} <strong>{captured}</strong>
         </span>
         <span>
-          Time from change to lakehouse <strong>{latencyText}</strong>
+          {copy.latency} <strong>{latencyText}</strong>
         </span>
-        <span>Simulated in your browser. In production I build this with Microsoft Fabric and Apache Kafka.</span>
+        <span>{copy.simulated}</span>
       </div>
     </div>
   );
@@ -302,19 +329,21 @@ export default function PipelineDemo() {
 function RowsTable({
   rows,
   flash,
+  copy,
   showItem = false,
 }: {
   rows: Row[];
   flash: { id: number; n: number } | null;
+  copy: PipelineCopy;
   showItem?: boolean;
 }) {
   return (
     <table className="ptable">
       <thead>
         <tr>
-          <th>id</th>
-          {showItem && <th>item</th>}
-          <th>status</th>
+          <th>{copy.cols.id}</th>
+          {showItem && <th>{copy.cols.item}</th>}
+          <th>{copy.cols.status}</th>
         </tr>
       </thead>
       <tbody>
@@ -323,8 +352,8 @@ function RowsTable({
           return (
             <tr key={isFlash ? `${r.id}-${flash!.n}` : r.id} data-flash={isFlash ? "" : undefined}>
               <td>{r.id}</td>
-              {showItem && <td style={{ color: "var(--ink-2)", paddingRight: 8 }}>{r.item}</td>}
-              <td>{r.status}</td>
+              {showItem && <td style={{ color: "var(--ink-2)", paddingRight: 8 }}>{copy.items[r.item]}</td>}
+              <td>{copy.status[r.status]}</td>
             </tr>
           );
         })}

@@ -350,6 +350,19 @@ body:has(.shell) {
     display: none;
   }
 }
+/* A label with a short form (German "Lebenslauf" → "CV") shows the long one by default
+   and the short one at the same extreme-narrow width where "View CV" becomes "CV". */
+.lbl-short {
+  display: none;
+}
+@media (max-width: 299.98px) {
+  .lbl-long {
+    display: none;
+  }
+  .lbl-short {
+    display: inline;
+  }
+}
 
 @media (min-width: 900px) {
   .side {
@@ -1231,7 +1244,7 @@ body:has(.shell) {
   border-radius: 50%;
   background: var(--cobalt);
 }
-/* ---------- key–value rows (Skills, Germany) ---------- */
+/* ---------- key–value rows (Skills, the German site’s Deutschland tab) ---------- */
 
 .rows {
   display: grid;

@@ -1,8 +1,8 @@
 import { ImageResponse } from "next/og";
 
 // The link card people see on LinkedIn, Slack and WhatsApp before they ever open the site.
-// Same message as the homepage: who, what, proof, Germany. No photo.
-export const alt = "Ankit Gupta, Senior Backend & Data Engineer. Moving to Germany in January 2027.";
+// Same message as the homepage (India site): who, what, proof. No photo.
+export const alt = "Ankit Gupta, Senior Backend & Data Engineer. Bengaluru, India.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -49,7 +49,7 @@ export default function Image() {
             Senior Backend &amp; Data Engineer
           </div>
           <div style={{ display: "flex", fontSize: 28, color: MUTED, marginTop: 8 }}>
-            Real-time data for AI products · Moving to Germany, January 2027
+            Real-time data for AI products · Bengaluru, India
           </div>
         </div>
 

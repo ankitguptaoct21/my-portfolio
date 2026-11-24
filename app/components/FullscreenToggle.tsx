@@ -21,10 +21,14 @@ export default function FullscreenToggle({
   targetId,
   fallbackHref,
   variant = "enter",
+  enterLabel = "Full screen",
+  exitLabel = "Exit full screen",
 }: {
   targetId: string;
   fallbackHref: string;
   variant?: "enter" | "exit";
+  enterLabel?: string;
+  exitLabel?: string;
 }) {
   const [active, setActive] = useState(false);
 
@@ -66,15 +70,15 @@ export default function FullscreenToggle({
     return (
       <button type="button" className="btn btn-sm btn-primary fs-exit" onClick={exit}>
         <Minimize size={15} aria-hidden="true" />
-        Exit full screen
+        {exitLabel}
       </button>
     );
   }
 
   return (
-    <button type="button" className="btn btn-sm fs-enter" onClick={enter} title="Full screen" aria-label="Full screen">
+    <button type="button" className="btn btn-sm fs-enter" onClick={enter} title={enterLabel} aria-label={enterLabel}>
       <Maximize size={15} aria-hidden="true" />
-      <span className="fs-label">Full screen</span>
+      <span className="fs-label">{enterLabel}</span>
     </button>
   );
 }

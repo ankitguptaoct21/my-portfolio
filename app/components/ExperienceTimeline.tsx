@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { TIMELINE_EN } from "../locales/ui-en";
 
 export type TimelineItem =
   | {
@@ -16,10 +17,19 @@ export type TimelineItem =
     }
   | { type: "break"; id: string; period: string; label: string };
 
+// Visible text; the German site passes its own.
+export type TimelineCopy = { hint: string; aria: string };
+
 // Experience as a vertical timeline, newest first. Only the timeline scrolls: while this
 // tab is open, a wheel/trackpad scroll anywhere on the page moves the timeline instead.
 // As it scrolls, the line fills with colour and the dot of the role in view lights up.
-export default function ExperienceTimeline({ items }: { items: TimelineItem[] }) {
+export default function ExperienceTimeline({
+  items,
+  copy = TIMELINE_EN,
+}: {
+  items: TimelineItem[];
+  copy?: TimelineCopy;
+}) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const frame = useRef(0);
@@ -107,7 +117,7 @@ export default function ExperienceTimeline({ items }: { items: TimelineItem[] })
 
   return (
     <div className={atEnd ? "tl-wrap is-end" : "tl-wrap"}>
-      <div ref={scrollRef} className="tl-scroll" tabIndex={0} aria-label="Experience timeline, newest first">
+      <div ref={scrollRef} className="tl-scroll" tabIndex={0} aria-label={copy.aria}>
         <div ref={innerRef} className="tl-inner">
           <div className="tl-rail" aria-hidden="true" style={{ top: rail.top, height: rail.height }}>
             <span className="tl-fill" style={{ height: Math.max(0, fill) }} />
@@ -159,7 +169,7 @@ export default function ExperienceTimeline({ items }: { items: TimelineItem[] })
         </div>
       </div>
       <p className="tl-hint" aria-hidden="true">
-        Scroll for more ↓
+        {copy.hint}
       </p>
     </div>
   );

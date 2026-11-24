@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
-import { PROFILE, CASES } from "./content";
+import { PROFILE } from "./content";
 import { SITE_URL } from "./site";
 import "./globals.css";
 
@@ -21,7 +21,9 @@ const mono = JetBrains_Mono({
   subsets: ["latin"],
 });
 
-const description = `${PROFILE.name}, ${PROFILE.role} (${PROFILE.discipline}). ${PROFILE.pitch} ${PROFILE.relocation}.`;
+// Root metadata describes the India site (theankitgupta.com); app/de/layout.tsx overrides it
+// for the German site.
+const description = `${PROFILE.name}, ${PROFILE.role} (${PROFILE.discipline}). ${PROFILE.pitch} Based in ${PROFILE.location}.`;
 
 export const metadata: Metadata = {
   // Without this, link previews on LinkedIn, Slack and WhatsApp resolve to localhost.
@@ -54,8 +56,8 @@ export const metadata: Metadata = {
     "Python",
     "Node.js",
     "TypeScript",
-    "Germany",
-    "Opportunity Card",
+    "Bengaluru",
+    "India",
   ],
   openGraph: {
     type: "profile",
@@ -80,36 +82,8 @@ export const viewport: Viewport = {
   ],
 };
 
-// Machine-readable profile, so search engines and AI sourcing tools describe Ankit accurately.
-const personSchema = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: PROFILE.name,
-  jobTitle: `${PROFILE.role}, ${PROFILE.discipline}`,
-  description: PROFILE.summary,
-  url: SITE_URL,
-  email: `mailto:${PROFILE.email}`,
-  address: { "@type": "PostalAddress", addressLocality: "Bengaluru", addressCountry: "IN" },
-  worksFor: { "@type": "Organization", name: CASES[0].company },
-  alumniOf: { "@type": "CollegeOrUniversity", name: "Devi Ahilya Vishwavidyalaya" },
-  knowsLanguage: ["hi", "en", "de"],
-  knowsAbout: [
-    "Change Data Capture",
-    "Apache Kafka",
-    "Microsoft Fabric",
-    "Lakehouse performance tuning",
-    "PySpark",
-    "Spark SQL",
-    "Real-time data for AI",
-    "Event-driven architecture",
-    "Distributed systems",
-    "Python",
-    "Node.js",
-    "TypeScript",
-  ],
-  sameAs: [PROFILE.github, PROFILE.linkedin],
-};
-
+// Structured data (schema.org Person) is rendered by each page, so the India and German
+// sites each point at their own URL. See components/PersonJsonLd.tsx.
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -120,13 +94,7 @@ export default function RootLayout({
       lang="en"
       className={`${display.variable} ${body.variable} ${mono.variable} antialiased`}
     >
-      <body>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema).replace(/</g, "\\u003c") }}
-        />
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

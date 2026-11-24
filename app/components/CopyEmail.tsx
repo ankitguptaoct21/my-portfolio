@@ -2,7 +2,17 @@
 
 import { useRef, useState } from "react";
 
-export default function CopyEmail({ email, className = "btn" }: { email: string; className?: string }) {
+export default function CopyEmail({
+  email,
+  className = "btn",
+  label = "Copy email",
+  copiedLabel = "Copied",
+}: {
+  email: string;
+  className?: string;
+  label?: string;
+  copiedLabel?: string;
+}) {
   const [copied, setCopied] = useState(false);
   const textRef = useRef<HTMLSpanElement>(null);
 
@@ -29,7 +39,7 @@ export default function CopyEmail({ email, className = "btn" }: { email: string;
         {email}
       </span>
       <button type="button" className={className} onClick={copy} aria-live="polite">
-        {copied ? "Copied" : "Copy email"}
+        {copied ? copiedLabel : label}
       </button>
     </>
   );

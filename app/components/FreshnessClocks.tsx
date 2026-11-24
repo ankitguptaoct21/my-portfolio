@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { CLOCKS_EN } from "../locales/ui-en";
 
 // Why real time matters: how old the data is when it's copied once an hour,
 // versus captured as it changes. Simulated at 60× speed (one second = one minute).
@@ -14,7 +15,22 @@ const mmss = (age: number) => {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 };
 
-export default function FreshnessClocks() {
+// All visible text; the German site passes its own. `locale` formats 0.8 vs 0,8.
+export type ClocksCopy = {
+  locale: string;
+  title: string;
+  body: string;
+  sr: string;
+  batchLabel: string;
+  batchUnit: string;
+  liveLabel: string;
+  liveUnit: string;
+  pause: string;
+  play: string;
+};
+
+
+export default function FreshnessClocks({ copy = CLOCKS_EN }: { copy?: ClocksCopy }) {
   const [batchAge, setBatchAge] = useState(START_AGE);
   const [liveAge, setLiveAge] = useState(0.8);
   const [runs, setRuns] = useState(0);
@@ -67,39 +83,35 @@ export default function FreshnessClocks() {
   return (
     <figure ref={rootRef} className="card fresh" aria-labelledby="fresh-title">
       <figcaption className="fresh-head">
-        <h3 id="fresh-title">Why real time matters</h3>
+        <h3 id="fresh-title">{copy.title}</h3>
         <button
           type="button"
           className="btn btn-sm fresh-toggle"
           onClick={() => setPaused((p) => !p)}
           aria-pressed={paused}
         >
-          {paused ? "Play" : "Pause"}
+          {paused ? copy.play : copy.pause}
         </button>
-        <p>
-          How old is the data your AI is reading right now? Below is the same table, copied once an hour versus
-          captured as it changes. This simulation runs at 60× speed.
-        </p>
+        <p>{copy.body}</p>
       </figcaption>
 
-      <p className="sr-only">
-        Copied once an hour, the data is up to an hour old before the next copy. Captured in real time, it stays
-        about a second old.
-      </p>
+      <p className="sr-only">{copy.sr}</p>
 
       <div className="fresh-grid" aria-hidden="true">
         <div key={runs} className={runs ? "clock clock-batch ran" : "clock clock-batch"} style={batchStyle}>
-          <p className="clock-label">Copied once an hour</p>
+          <p className="clock-label">{copy.batchLabel}</p>
           <p className="clock-num tnum">{mmss(batchAge)}</p>
-          <p className="clock-unit">minutes old</p>
+          <p className="clock-unit">{copy.batchUnit}</p>
           <div className="clock-bar">
             <span style={{ width: `${Math.max(1, t * 100).toFixed(1)}%` }} />
           </div>
         </div>
         <div className="clock clock-live">
-          <p className="clock-label">Captured in real time · what I build</p>
-          <p className="clock-num tnum">{liveAge.toFixed(1)}</p>
-          <p className="clock-unit">seconds old</p>
+          <p className="clock-label">{copy.liveLabel}</p>
+          <p className="clock-num tnum">
+            {liveAge.toLocaleString(copy.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+          </p>
+          <p className="clock-unit">{copy.liveUnit}</p>
           <div className="clock-bar">
             <span style={{ width: "1%" }} />
           </div>
